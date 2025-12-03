@@ -12,7 +12,7 @@ import com.santa.auth_service.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -34,8 +34,8 @@ public class AuthService {
                 .email(req.getEmail())
                 .passwordHash(req.getPassword())
                 .isActive(false)
-                .createdAt(new Date())
-                .updatedAt(new Date())
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
 
         User createdUser = userRepo.save(user);

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -31,7 +32,7 @@ public class ProfileService {
         currentUser.setFull_name(req.getFullName());
         currentUser.setDob(LocalDate.parse(req.getDob()));
         currentUser.setPhone(req.getPhone());
-        currentUser.setUpdated_at(LocalDate.now());
+        currentUser.setUpdated_at(LocalDateTime.now());
 
         return new ProfileUpdateResponseDTO("Profile has been updated");
     }

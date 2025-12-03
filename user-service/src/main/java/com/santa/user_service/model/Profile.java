@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +20,6 @@ public class Profile {
     private LocalDate dob;
     private String phone;
     private boolean kyc_status;
-    private LocalDate created_at;
-    private LocalDate updated_at;
+    private LocalDateTime created_at;
+    private LocalDateTime updated_at;
 }
