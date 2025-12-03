@@ -1,38 +1,38 @@
 package com.santa.user_service.service;
 
-import com.santa.user_service.exception.UserNotFoundException;
-import com.santa.user_service.model.User;
-import com.santa.user_service.repo.UserRepo;
+import com.santa.user_service.dto.ProfileUpdateRequestDTO;
+import com.santa.user_service.dto.ProfileUpdateResponseDTO;
+import com.santa.user_service.exception.ProfileNotFoundException;
+import com.santa.user_service.model.Profile;
+import com.santa.user_service.repo.ProfileRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.UUID;
 
 @Service
-public class UserService {
+public class ProfileService {
 
-    private UserRepo userRepo;
+    private ProfileRepo profileRepo;
 
     @Autowired
-    public UserService(UserRepo userRepo){
-        this.userRepo = userRepo;
+    public ProfileService(ProfileRepo profileRepo){
+        this.profileRepo = profileRepo;
     }
 
-    public User getUser(Integer id){
-        return userRepo.findById(id).orElseThrow(()->new UserNotFoundException(id));
+    public Profile getProfile(UUID id){
+        return profileRepo.findById(id).orElseThrow(()->new ProfileNotFoundException(id.toString()));
     }
 
-    public User updateUser(User user){
-        User currentUser = getUser(user.getUser_id());
+    public ProfileUpdateResponseDTO updateUser(ProfileUpdateRequestDTO req){
+        Profile currentUser = getProfile(UUID.fromString(req.getUserId()));
 
-        currentUser.setFull_name(user.getFull_name());
-        currentUser.setDob(user.getDob());
-        currentUser.setPhone(user.getPhone());
-        currentUser.setCreated_at(LocalDate.now());
-        currentUser.setUpdated_at(new Date());
+        currentUser.setFull_name(req.getFullName());
+        currentUser.setDob(LocalDate.parse(req.getDob()));
+        currentUser.setPhone(req.getPhone());
+        currentUser.setUpdated_at(LocalDate.now());
 
-        return currentUser;
+        return new ProfileUpdateResponseDTO("Profile has been updated");
     }
 }

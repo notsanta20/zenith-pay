@@ -1,32 +1,36 @@
 package com.santa.user_service.controller;
 
-import com.santa.user_service.model.User;
-import com.santa.user_service.service.UserService;
+import com.santa.user_service.dto.ProfileUpdateRequestDTO;
+import com.santa.user_service.dto.ProfileUpdateResponseDTO;
+import com.santa.user_service.model.Profile;
+import com.santa.user_service.service.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/profile")
-public class UserController {
+public class ProfileController {
 
-    private UserService userService;
+    private ProfileService profileService;
 
     @Autowired
-    public UserController(UserService userService){
-        this.userService = userService;
+    public ProfileController(ProfileService profileService){
+        this.profileService = profileService;
     }
 
     @GetMapping("/me/{id}")
-    public ResponseEntity<User> getProfile(@PathVariable int id){
-        User user = userService.getUser(id);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<Profile> getProfile(@PathVariable String id){
+        Profile profile = profileService.getProfile(UUID.fromString(id));
+        return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<User> updateProfile(User user){
-        User updatedUser = userService.updateUser(user);
+    public ResponseEntity<ProfileUpdateResponseDTO> updateProfile(@RequestBody ProfileUpdateRequestDTO req){
+        ProfileUpdateResponseDTO updatedUser = profileService.updateUser(req);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 }
