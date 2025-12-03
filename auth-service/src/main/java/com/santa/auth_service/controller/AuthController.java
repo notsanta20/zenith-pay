@@ -1,7 +1,6 @@
 package com.santa.auth_service.controller;
 
-import com.santa.auth_service.dto.RegisterRequestDTO;
-import com.santa.auth_service.dto.RegisterResponseDTO;
+import com.santa.auth_service.dto.*;
 import com.santa.auth_service.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,5 +25,18 @@ public class AuthController {
         RegisterResponseDTO res = authService.registerUser(req);
 
         return new ResponseEntity<>(res,HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> registerUser(@RequestBody LoginRequestDTO req){
+        LoginResponseDTO res = authService.loginUser(req);
+
+        return new ResponseEntity<>(res,HttpStatus.OK);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(@RequestBody RefreshTokenRequestDTO req){
+
+        return new ResponseEntity<>(new RefreshTokenResponseDTO("asdf","asdf","1000"),HttpStatus.OK);
     }
 }
