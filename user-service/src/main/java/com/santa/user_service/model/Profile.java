@@ -1,13 +1,15 @@
 package com.santa.user_service.model;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "users")
+@Table(name = "profiles")
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
