@@ -32,7 +32,10 @@ public class ProfileService {
         currentUser.setFull_name(req.getFullName());
         currentUser.setDob(LocalDate.parse(req.getDob()));
         currentUser.setPhone(req.getPhone());
+        currentUser.setKyc_status(true);
         currentUser.setUpdated_at(LocalDateTime.now());
+
+        profileRepo.save(currentUser);
 
         return new ProfileUpdateResponseDTO("Profile has been updated");
     }
