@@ -1,8 +1,10 @@
 package com.santa.user_service.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,9 +14,10 @@ import java.util.UUID;
 @Data
 @Table(name = "profiles")
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Profile {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID user_id;
     private String full_name;
     private LocalDate dob;
