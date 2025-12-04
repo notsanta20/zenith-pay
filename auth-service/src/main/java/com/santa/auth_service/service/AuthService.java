@@ -8,7 +8,7 @@ import com.santa.auth_service.exception.EmailAlreadyExistsException;
 import com.santa.auth_service.exception.IncorrectPasswordException;
 import com.santa.auth_service.exception.UserNotFoundException;
 import com.santa.auth_service.model.User;
-import com.santa.auth_service.producer.UserRegistrationProducer;
+import com.santa.auth_service.producer.ProfileCreationProducer;
 import com.santa.auth_service.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,12 @@ import java.util.Optional;
 public class AuthService {
 
     private UserRepo userRepo;
-    private UserRegistrationProducer userRegistrationProducer;
+    private ProfileCreationProducer profileCreationProducer;
 
     @Autowired
-    public AuthService(UserRepo userRepo, UserRegistrationProducer userRegistrationProducer) {
+    public AuthService(UserRepo userRepo, ProfileCreationProducer profileCreationProducer) {
         this.userRepo = userRepo;
-        this.userRegistrationProducer = userRegistrationProducer;
+        this.profileCreationProducer = profileCreationProducer;
     }
 
     public RegisterResponseDTO registerUser(RegisterRequestDTO req) {
@@ -42,7 +42,7 @@ public class AuthService {
                 .build();
 
         User createdUser = userRepo.save(user);
-        userRegistrationProducer.createProfile(createdUser.getId().toString());
+        profileCreationProducer.createProfile(createdUser.getId().toString());
 
         return new RegisterResponseDTO(createdUser.getId().toString(), "User created successfully");
     }
