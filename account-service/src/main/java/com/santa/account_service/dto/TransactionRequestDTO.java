@@ -1,11 +1,11 @@
 package com.santa.account_service.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-public class TransactionDTO {
+public class TransactionRequestDTO {
     private String accountId;
+    private String txnId;
     private double amount;
+    private String type;
 }
