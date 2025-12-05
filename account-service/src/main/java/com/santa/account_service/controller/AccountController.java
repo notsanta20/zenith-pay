@@ -1,8 +1,6 @@
 package com.santa.account_service.controller;
 
-import com.santa.account_service.dto.AccountCreationRequestDTO;
-import com.santa.account_service.dto.AccountResponseDTO;
-import com.santa.account_service.dto.UpdateStatusRequestDTO;
+import com.santa.account_service.dto.*;
 import com.santa.account_service.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,8 +34,19 @@ public class AccountController {
     }
 
     @PatchMapping("/{accountId}")
-    public ResponseEntity<AccountResponseDTO> updateAccountStatus(@PathVariable String accountId, @RequestBody UpdateStatusRequestDTO req){
+    public ResponseEntity<AccountResponseDTO> updateAccountStatus(
+            @PathVariable String accountId,
+            @RequestBody UpdateStatusRequestDTO req){
         AccountResponseDTO res = accountService.updateAccountStatus(accountId,req);
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @PutMapping("/{accountId}/transact")
+    public ResponseEntity<TransactionResponseDTO> updateAccountBalance(
+            @PathVariable String accountId,
+            @RequestBody TransactionRequestDTO req){
+        TransactionResponseDTO res = accountService.updateAccountBalance(accountId,req);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }

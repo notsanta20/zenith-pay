@@ -1,9 +1,8 @@
 package com.santa.account_service.service;
 
-import com.santa.account_service.dto.AccountCreationRequestDTO;
-import com.santa.account_service.dto.AccountResponseDTO;
-import com.santa.account_service.dto.UpdateStatusRequestDTO;
+import com.santa.account_service.dto.*;
 import com.santa.account_service.exception.AccountNotFoundException;
+import com.santa.account_service.exception.InsufficientBalanceException;
 import com.santa.account_service.model.Account;
 import com.santa.account_service.model.AccountStatus;
 import com.santa.account_service.model.AccountType;
@@ -56,13 +55,34 @@ public class AccountService {
     }
 
 
-    public AccountResponseDTO updateAccountStatus(String id, UpdateStatusRequestDTO req) {
-        Account account = accountRepo.findById(UUID.fromString(id)).orElseThrow(()->new AccountNotFoundException(id));
+    public AccountResponseDTO updateAccountStatus(String accountId, UpdateStatusRequestDTO req) {
+        Account account = accountRepo.findById(UUID.fromString(accountId)).orElseThrow(()->new AccountNotFoundException(accountId));
 
         account.setAccountStatus(AccountStatus.valueOf(req.getStatus()));
         accountRepo.save(account);
 
         return new AccountResponseDTO(account);
+    }
+
+    public TransactionResponseDTO updateAccountBalance(String accountId, TransactionRequestDTO req) {
+        Account account = accountRepo.findById(UUID.fromString(accountId)).orElseThrow(()->new AccountNotFoundException(accountId));
+
+        double currentBal = account.getBalance();
+
+        if(req.getType().equals("DEBIT")){
+            if(currentBal < req.getAmount()){
+                throw new InsufficientBalanceException(currentBal);
+            }
+
+            account.setBalance(currentBal-req.getAmount());
+        }
+        else if(req.getType().equals("CREDIT")){
+            account.setBalance(currentBal + req.getAmount());
+        }
+
+        accountRepo.save(account);
+
+        return new TransactionResponseDTO("Success", account.getBalance());
     }
 
     public Page<AccountResponseDTO> getAllAccounts(String userId, int page, int size) {
