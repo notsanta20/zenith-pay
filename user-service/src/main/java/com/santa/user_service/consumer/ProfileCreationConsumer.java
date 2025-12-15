@@ -19,7 +19,7 @@ public class ProfileCreationConsumer {
         this.profileRepo = profileRepo;
     }
 
-    @KafkaListener(topics = "new-topic", groupId = "profile-creation-group")
+    @KafkaListener(topics = "create-profile", groupId = "create-profile-group")
     public void createProfile(String userId){
         Profile profile = Profile.builder()
                 .user_id(UUID.fromString(userId))
