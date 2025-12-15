@@ -1,11 +1,11 @@
 package com.santa.auth_service.advice;
 
-import com.santa.auth_service.exception.EmailAlreadyExistsException;
-import com.santa.auth_service.exception.ErrorResponse;
-import com.santa.auth_service.exception.IncorrectPasswordException;
-import com.santa.auth_service.exception.UserNotFoundException;
+import com.santa.auth_service.exception.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -24,9 +24,27 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(IncorrectPasswordException.class)
-    public ResponseEntity<ErrorResponse> handleIncorrectPassword(IncorrectPasswordException ex) {
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),"Invalid Email id or Password");
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(UnAuthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorization(UnAuthorizedException ex) {
         ErrorResponse error = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidJwtToken(SignatureException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),"Invalid JWT token");
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredJwtToken(ExpiredJwtException ex) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(),"JWT token expired");
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
