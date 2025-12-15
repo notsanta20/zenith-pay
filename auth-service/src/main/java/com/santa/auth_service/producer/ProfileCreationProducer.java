@@ -12,6 +12,6 @@ public class ProfileCreationProducer {
     }
 
     public void createProfile(String userId){
-        kafkaTemplate.send("new-topic",userId);
+        kafkaTemplate.send("create-profile",userId);
     }
 }
