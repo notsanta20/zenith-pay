@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
@@ -29,6 +30,13 @@ public class AccountController {
     @GetMapping("/{accountId}")
     public ResponseEntity<AccountResponseDTO> getAccount(@PathVariable String accountId){
         AccountResponseDTO res = accountService.getAccount(accountId);
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{userId}/total-balance")
+    public ResponseEntity<Double> getTotalBalance(@PathVariable String userId){
+        double res = accountService.getTotalBalance(userId);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }

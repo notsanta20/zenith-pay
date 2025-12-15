@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -52,6 +53,21 @@ public class AccountService {
         Account account = accountRepo.findById(UUID.fromString(id)).orElseThrow(()->new AccountNotFoundException(id));
 
         return new AccountResponseDTO(account);
+    }
+
+    public double getTotalBalance(String userId) {
+        Pageable pageable = PageRequest.of(0,10);
+        Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId),pageable);
+
+        if(!accounts.hasContent()){
+            throw new AccountNotFoundException(userId);
+        }
+
+        double totalBalance = accounts.stream()
+                        .map(a->a.getBalance())
+                                .reduce(0.0,(a,e)->a+=e);
+
+        return totalBalance;
     }
 
 
