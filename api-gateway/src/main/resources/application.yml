@@ -13,6 +13,21 @@ spring:
               enabled: true
               lower-case-service-id: true
 
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
       routes:
         - id: auth-service
           uri: lb://AUTH-SERVICE
@@ -20,6 +35,21 @@ spring:
             - Path=/api/auth/**
           filters:
             - AuthenticationFilter
+
+        - id: user-profile-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/profile/**
+          filters:
+            - AuthenticationFilter
+
+        - id: account-service
+          uri: lb://ACCOUNT-SERVICE
+          predicates:
+            - Path=/api/accounts/**
+          filters:
+            - AuthenticationFilter
+
 
   config:
     import: optional:file:.env[.properties]
