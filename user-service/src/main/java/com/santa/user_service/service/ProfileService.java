@@ -35,14 +35,13 @@ public class ProfileService {
         currentUser.setFull_name(req.getFullName());
         currentUser.setDob(LocalDate.parse(req.getDob()));
         currentUser.setPhone(req.getPhone());
-        currentUser.setKyc_status(true);
+        currentUser.setKyc_status(false);
         currentUser.setUpdated_at(LocalDateTime.now());
-        currentUser.setKyc_status(true);
 
         profileRepo.save(currentUser);
         activateAccountProducer.activateAccount(req.getUserId());
 
 
-        return new ProfileUpdateResponseDTO("Profile has been updated");
+        return new ProfileUpdateResponseDTO("Profile has been updated", currentUser.isKyc_status());
     }
 }
