@@ -1,10 +1,7 @@
 package com.santa.auth_service.service;
 
 import com.santa.auth_service.config.jwt.JwtService;
-import com.santa.auth_service.dto.LoginRequestDTO;
-import com.santa.auth_service.dto.LoginResponseDTO;
-import com.santa.auth_service.dto.RegisterRequestDTO;
-import com.santa.auth_service.dto.RegisterResponseDTO;
+import com.santa.auth_service.dto.*;
 import com.santa.auth_service.exception.EmailAlreadyExistsException;
 import com.santa.auth_service.exception.UnAuthorizedException;
 import com.santa.auth_service.exception.UserNotFoundException;
@@ -61,7 +58,7 @@ public class AuthService {
         return new RegisterResponseDTO(createdUser.getId().toString(), "User created successfully");
     }
 
-    public LoginResponseDTO loginUser(LoginRequestDTO req) {
+    public LoginRes loginUser(LoginRequestDTO req) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
 
@@ -70,10 +67,10 @@ public class AuthService {
 
             String token = jwtService.generateToken(user.getEmail());
 
-            LoginResponseDTO res = LoginResponseDTO.builder()
+            LoginRes res = LoginRes.builder()
                     .accessToken(token)
                     .refreshToken("asdf")
-                    .expiry("2m")
+                    .expiry(1000*60*2)
                     .userId(user.getId().toString())
                     .email(user.getEmail())
                     .isActive(user.isActive())
