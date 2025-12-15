@@ -11,4 +11,5 @@ public class LoginResponseDTO {
     private String expiry;
     private String userId;
     private String email;
+    private boolean isActive;
 }
