@@ -4,6 +4,7 @@ import com.santa.user_service.dto.ProfileUpdateRequestDTO;
 import com.santa.user_service.dto.ProfileUpdateResponseDTO;
 import com.santa.user_service.exception.ProfileNotFoundException;
 import com.santa.user_service.model.Profile;
+import com.santa.user_service.producer.ActivateAccountProducer;
 import com.santa.user_service.repo.ProfileRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,12 @@ import java.util.UUID;
 public class ProfileService {
 
     private ProfileRepo profileRepo;
+    private ActivateAccountProducer activateAccountProducer;
 
     @Autowired
-    public ProfileService(ProfileRepo profileRepo){
+    public ProfileService(ProfileRepo profileRepo, ActivateAccountProducer activateAccountProducer){
         this.profileRepo = profileRepo;
+        this.activateAccountProducer = activateAccountProducer;
     }
 
     public Profile getProfile(UUID id){
@@ -34,8 +37,11 @@ public class ProfileService {
         currentUser.setPhone(req.getPhone());
         currentUser.setKyc_status(true);
         currentUser.setUpdated_at(LocalDateTime.now());
+        currentUser.setKyc_status(true);
 
         profileRepo.save(currentUser);
+        activateAccountProducer.activateAccount(req.getUserId());
+
 
         return new ProfileUpdateResponseDTO("Profile has been updated");
     }
