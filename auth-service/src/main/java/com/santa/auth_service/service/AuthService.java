@@ -58,6 +58,7 @@ public class AuthService {
                 .expiry("1m")
                 .userId(user.getId().toString())
                 .email(user.getEmail())
+                .isActive(user.isActive())
                 .build();
 
         return res;
