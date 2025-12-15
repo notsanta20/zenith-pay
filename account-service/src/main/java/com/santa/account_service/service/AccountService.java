@@ -6,6 +6,7 @@ import com.santa.account_service.exception.InsufficientBalanceException;
 import com.santa.account_service.model.Account;
 import com.santa.account_service.model.AccountStatus;
 import com.santa.account_service.model.AccountType;
+import com.santa.account_service.producer.ProfileUpdateProducer;
 import com.santa.account_service.repo.AccountRepo;
 import com.santa.account_service.utlis.LongNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,17 @@ import java.util.UUID;
 public class AccountService {
 
     private AccountRepo accountRepo;
+    private ProfileUpdateProducer profileUpdateProducer;
 
     @Autowired
-    public AccountService(AccountRepo accountRepo) {
+    public AccountService(AccountRepo accountRepo, ProfileUpdateProducer profileUpdateProducer) {
         this.accountRepo = accountRepo;
+        this.profileUpdateProducer = profileUpdateProducer;
     }
 
     public AccountResponseDTO createAccount(AccountCreationRequestDTO req) {
+        List<Account> accounts = accountRepo.findAll();
+
         String accountNumber = LongNumberGenerator.getID(12);
         String ifsc = LongNumberGenerator.getID(10);
 
@@ -45,6 +50,10 @@ public class AccountService {
                 .build();
 
         accountRepo.save(account);
+
+        if(accounts.size() == 0){
+            profileUpdateProducer.updateProfile(req.getUserId());
+        }
 
         return new AccountResponseDTO(account);
     }
