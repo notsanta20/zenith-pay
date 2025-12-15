@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/profile")
+@RequestMapping("/api/profile")
 public class ProfileController {
 
     private ProfileService profileService;
