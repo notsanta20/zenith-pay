@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient("ACCOUNT-SERVICE")
 public interface AccountInterface {
     @PutMapping("accounts/{accountId}/transact")
-    public ResponseEntity<TransactionResponseDTO> updateAccountBalance(
+    ResponseEntity<TransactionResponseDTO> updateAccountBalance(
             @PathVariable String accountId,
             @RequestBody TransactionRequestDTO req);
 }

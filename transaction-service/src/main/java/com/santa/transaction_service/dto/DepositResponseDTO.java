@@ -3,7 +3,6 @@ package com.santa.transaction_service.dto;
 import com.santa.transaction_service.model.Transaction;
 import com.santa.transaction_service.model.TransactionStatus;
 import com.santa.transaction_service.model.TransactionType;
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;

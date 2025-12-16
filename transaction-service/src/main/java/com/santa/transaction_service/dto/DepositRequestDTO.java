@@ -1,6 +1,5 @@
 package com.santa.transaction_service.dto;
 
-import com.santa.transaction_service.model.TransactionType;
 import lombok.Data;
 
 

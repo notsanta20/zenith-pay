@@ -19,8 +19,8 @@ import java.util.UUID;
 @Service
 public class TransactionService {
 
-    private TransactionRepo transactionRepo;
-    private AccountInterface accountInterface;
+    private final TransactionRepo transactionRepo;
+    private final AccountInterface accountInterface;
 
     @Autowired
     public TransactionService(TransactionRepo transactionRepo, AccountInterface accountInterface) {
