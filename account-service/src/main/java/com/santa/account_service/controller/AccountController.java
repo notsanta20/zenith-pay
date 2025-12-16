@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/accounts")
 public class AccountController {
 
-    private AccountService accountService;
+    private final AccountService accountService;
 
     @Autowired
     public AccountController(AccountService accountService) {
@@ -58,13 +58,18 @@ public class AccountController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user")
     public ResponseEntity<Page<AccountResponseDTO>> getAllAccounts(
-            @PathVariable String userId,
+            @RequestHeader("userId") String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
         Page<AccountResponseDTO> res = accountService.getAllAccounts(userId,page,size);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
+    @GetMapping("/total-accounts")
+    public int getTotalAccount(@RequestHeader("userId") String userId){
+        return accountService.getTotalAccounts(userId);
     }
 }

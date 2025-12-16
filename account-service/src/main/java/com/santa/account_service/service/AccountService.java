@@ -16,14 +16,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public class AccountService {
 
-    private AccountRepo accountRepo;
-    private ProfileUpdateProducer profileUpdateProducer;
+    private final AccountRepo accountRepo;
+    private final ProfileUpdateProducer profileUpdateProducer;
 
     @Autowired
     public AccountService(AccountRepo accountRepo, ProfileUpdateProducer profileUpdateProducer) {
@@ -32,7 +31,7 @@ public class AccountService {
     }
 
     public AccountResponseDTO createAccount(AccountCreationRequestDTO req) {
-        List<Account> accounts = accountRepo.findAll();
+        int totalAccounts = getTotalAccounts(req.getUserId());
 
         String accountNumber = LongNumberGenerator.getID(12);
         String ifsc = LongNumberGenerator.getID(10);
@@ -51,7 +50,7 @@ public class AccountService {
 
         accountRepo.save(account);
 
-        if(accounts.size() == 0){
+        if(totalAccounts == 0){
             profileUpdateProducer.updateProfile(req.getUserId());
         }
 
@@ -72,11 +71,10 @@ public class AccountService {
             throw new AccountNotFoundException(userId);
         }
 
-        double totalBalance = accounts.stream()
-                        .map(a->a.getBalance())
-                                .reduce(0.0,(a,e)->a+=e);
+        return accounts.stream()
+                        .map(Account::getBalance)
+                                .reduce(0.0,(a,e)-> a+=e);
 
-        return totalBalance;
     }
 
 
@@ -115,5 +113,12 @@ public class AccountService {
         Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId),pageable);
 
         return accounts.map(AccountResponseDTO::new);
+    }
+
+    public int getTotalAccounts(String userId) {
+        Pageable pageable = PageRequest.of(0,10);
+        Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId),pageable);
+
+        return (int) accounts.getTotalElements();
     }
 }
