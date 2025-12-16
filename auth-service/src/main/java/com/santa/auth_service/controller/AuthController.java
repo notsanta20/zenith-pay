@@ -2,6 +2,7 @@ package com.santa.auth_service.controller;
 
 import com.santa.auth_service.dto.*;
 import com.santa.auth_service.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDTO> registerUser(@RequestBody RegisterRequestDTO req){
+    public ResponseEntity<RegisterResponseDTO> registerUser(@RequestBody RegisterRequestDTO req) {
         RegisterResponseDTO res = authService.registerUser(req);
 
-        return new ResponseEntity<>(res,HttpStatus.CREATED);
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> loginUser(@RequestBody LoginRequestDTO req, HttpServletResponse response){
+    public ResponseEntity<LoginResponseDTO> loginUser(@RequestBody LoginRequestDTO req, HttpServletResponse response) {
         LoginRes auth = authService.loginUser(req);
 
         LoginResponseDTO res = LoginResponseDTO.builder()
@@ -47,12 +48,19 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());
 
-        return new ResponseEntity<>(res,HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(@RequestBody RefreshTokenRequestDTO req){
+    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(@RequestBody RefreshTokenRequestDTO req) {
 
-        return new ResponseEntity<>(new RefreshTokenResponseDTO("asdf","asdf","1000"),HttpStatus.OK);
+        return new ResponseEntity<>(new RefreshTokenResponseDTO("asdf", "asdf", "1000"), HttpStatus.OK);
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<VerifyUserResponseDTO> verifyUser(HttpServletRequest req) {
+        VerifyUserResponseDTO res = authService.verifyUser(req);
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }

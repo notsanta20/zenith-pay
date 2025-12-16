@@ -8,6 +8,8 @@ import com.santa.auth_service.exception.UserNotFoundException;
 import com.santa.auth_service.model.User;
 import com.santa.auth_service.producer.ProfileCreationProducer;
 import com.santa.auth_service.repo.UserRepo;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -63,14 +66,14 @@ public class AuthService {
                 .authenticate(new UsernamePasswordAuthenticationToken(req.getEmail(), req.getPassword()));
 
         if (authentication.isAuthenticated()) {
-            User user = userRepo.findByEmail(req.getEmail()).orElseThrow(()->new UserNotFoundException(req.getEmail()));
+            User user = userRepo.findByEmail(req.getEmail()).orElseThrow(() -> new UserNotFoundException(req.getEmail()));
 
             String token = jwtService.generateToken(user.getEmail());
 
             LoginRes res = LoginRes.builder()
                     .accessToken(token)
                     .refreshToken("asdf")
-                    .expiry(1000*60*2)
+                    .expiry(1000 * 60 * 2)
                     .userId(user.getId().toString())
                     .email(user.getEmail())
                     .isActive(user.isActive())
@@ -81,5 +84,17 @@ public class AuthService {
             throw new UnAuthorizedException();
         }
 
+    }
+
+    public VerifyUserResponseDTO verifyUser(HttpServletRequest req) {
+        String email = req.getAttribute("userEmail").toString();
+
+        if (email == null) {
+            return new VerifyUserResponseDTO(null, "user is not valid", false);
+        }
+
+        User user = userRepo.findByEmail(email).orElseThrow(()->new UserNotFoundException(email));
+
+        return new VerifyUserResponseDTO(user.getId().toString(), "user is verified", true);
     }
 }
