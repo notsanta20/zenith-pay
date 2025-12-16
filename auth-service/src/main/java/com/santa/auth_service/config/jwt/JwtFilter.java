@@ -71,8 +71,6 @@ public class JwtFilter extends OncePerRequestFilter {
                     }
                 }
 
-                request.setAttribute("userEmail", email);
-
                 filterChain.doFilter(request, response);
             } catch (Exception e) {
                 if (e instanceof NullPointerException) {
