@@ -16,8 +16,8 @@ import java.util.UUID;
 @Service
 public class ProfileService {
 
-    private ProfileRepo profileRepo;
-    private ActivateAccountProducer activateAccountProducer;
+    private final ProfileRepo profileRepo;
+    private final ActivateAccountProducer activateAccountProducer;
 
     @Autowired
     public ProfileService(ProfileRepo profileRepo, ActivateAccountProducer activateAccountProducer){
@@ -43,5 +43,11 @@ public class ProfileService {
 
 
         return new ProfileUpdateResponseDTO("Profile has been updated", currentUser.isKyc_status());
+    }
+
+    public boolean getKycStatus(String userId) {
+        Profile profile = getProfile(UUID.fromString(userId));
+
+        return profile.isKyc_status();
     }
 }

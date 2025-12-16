@@ -15,15 +15,15 @@ import java.util.UUID;
 @RequestMapping("/api/profile")
 public class ProfileController {
 
-    private ProfileService profileService;
+    private final ProfileService profileService;
 
     @Autowired
     public ProfileController(ProfileService profileService){
         this.profileService = profileService;
     }
 
-    @GetMapping("/me/{id}")
-    public ResponseEntity<Profile> getProfile(@PathVariable String id){
+    @GetMapping("/me")
+    public ResponseEntity<Profile> getProfile(@RequestHeader("userId") String id){
         Profile profile = profileService.getProfile(UUID.fromString(id));
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
@@ -32,5 +32,10 @@ public class ProfileController {
     public ResponseEntity<ProfileUpdateResponseDTO> updateProfile(@RequestBody ProfileUpdateRequestDTO req){
         ProfileUpdateResponseDTO updatedUser = profileService.updateUser(req);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @GetMapping("/kyc-status")
+    public boolean checkKycStatus(@RequestHeader("userId") String userId){
+        return profileService.getKycStatus(userId);
     }
 }
