@@ -1,6 +1,5 @@
 package com.santa.account_service.utlis;
 
-import java.util.Random;
 import java.util.UUID;
 
 public class LongNumberGenerator {
