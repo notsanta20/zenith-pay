@@ -5,11 +5,11 @@ import com.santa.auth_service.dto.*;
 import com.santa.auth_service.exception.EmailAlreadyExistsException;
 import com.santa.auth_service.exception.UnAuthorizedException;
 import com.santa.auth_service.exception.UserNotFoundException;
+import com.santa.auth_service.feign.AccountInterface;
+import com.santa.auth_service.feign.ProfileInterface;
 import com.santa.auth_service.model.User;
 import com.santa.auth_service.producer.ProfileCreationProducer;
 import com.santa.auth_service.repo.UserRepo;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,28 +18,34 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    private UserRepo userRepo;
-    private ProfileCreationProducer profileCreationProducer;
+    private final UserRepo userRepo;
+    private final ProfileCreationProducer profileCreationProducer;
     AuthenticationManager authenticationManager;
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final ProfileInterface profileInterface;
+    private final AccountInterface accountInterface;
 
     @Autowired
     public AuthService(UserRepo userRepo,
                        ProfileCreationProducer profileCreationProducer,
                        AuthenticationManager authenticationManager,
-                       JwtService jwtService) {
+                       JwtService jwtService,
+                       ProfileInterface profileInterface,
+                       AccountInterface accountInterface) {
         this.userRepo = userRepo;
         this.profileCreationProducer = profileCreationProducer;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.profileInterface = profileInterface;
+        this.accountInterface = accountInterface;
     }
 
     public RegisterResponseDTO registerUser(RegisterRequestDTO req) {
@@ -58,7 +64,7 @@ public class AuthService {
         User createdUser = userRepo.save(user);
         profileCreationProducer.createProfile(createdUser.getId().toString());
 
-        return new RegisterResponseDTO(createdUser.getId().toString(), "User created successfully");
+        return new RegisterResponseDTO("User created successfully");
     }
 
     public LoginRes loginUser(LoginRequestDTO req) {
@@ -68,9 +74,9 @@ public class AuthService {
         if (authentication.isAuthenticated()) {
             User user = userRepo.findByEmail(req.getEmail()).orElseThrow(() -> new UserNotFoundException(req.getEmail()));
 
-            String token = jwtService.generateToken(user.getEmail());
+            String token = jwtService.generateToken(user.getEmail(), user.getId().toString());
 
-            LoginRes res = LoginRes.builder()
+            return LoginRes.builder()
                     .accessToken(token)
                     .refreshToken("asdf")
                     .expiry(1000 * 60 * 2)
@@ -79,22 +85,23 @@ public class AuthService {
                     .isActive(user.isActive())
                     .build();
 
-            return res;
         } else {
             throw new UnAuthorizedException();
         }
 
     }
 
-    public VerifyUserResponseDTO verifyUser(HttpServletRequest req) {
-        String email = req.getAttribute("userEmail").toString();
+    public VerifyUserResponseDTO verifyUser(String userID) {
+        User user = userRepo.findById(UUID.fromString(userID)).orElseThrow(()->new UserNotFoundException(userID));
 
-        if (email == null) {
-            return new VerifyUserResponseDTO(null, "user is not valid", false);
-        }
+        return new VerifyUserResponseDTO("user is Authenticated", user.isActive());
+    }
 
-        User user = userRepo.findByEmail(email).orElseThrow(()->new UserNotFoundException(email));
+    public UserBootstrapDTO userBootstrap(String userID) {
+        User user = userRepo.findById(UUID.fromString(userID)).orElseThrow(()->new UserNotFoundException(userID));
+        boolean kycStatus = profileInterface.checkKycStatus(userID);
+        int totalAccounts = accountInterface.getTotalAccount(userID);
 
-        return new VerifyUserResponseDTO(user.getId().toString(), "user is verified", true);
+        return new UserBootstrapDTO(user.isActive(), kycStatus, totalAccounts);
     }
 }
