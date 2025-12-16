@@ -50,6 +50,13 @@ spring:
           filters:
             - AuthenticationFilter
 
+        - id: transaction-service
+          uri: lb://TRANSACTION-SERVICE
+          predicates:
+            - Path=/api/transactions/**
+          filters:
+            - AuthenticationFilter
+
 
   config:
     import: optional:file:.env[.properties]
