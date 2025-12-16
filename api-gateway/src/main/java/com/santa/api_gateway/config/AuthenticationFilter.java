@@ -1,6 +1,7 @@
 package com.santa.api_gateway.config;
 
 import com.santa.api_gateway.config.jwt.JwtUtil;
+import com.santa.api_gateway.exception.JwtMissingException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -30,7 +31,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     token = exchange.getRequest().getCookies().get("authToken").getFirst().getValue();
                 }
                 else{
-                    throw new JwtException("missing auth token");
+                    throw new JwtMissingException();
                 }
 
 
