@@ -12,7 +12,7 @@ import java.util.UUID;
 @Component
 public class ProfileCreationConsumer {
 
-    private ProfileRepo profileRepo;
+    private final ProfileRepo profileRepo;
 
     @Autowired
     public ProfileCreationConsumer(ProfileRepo profileRepo) {

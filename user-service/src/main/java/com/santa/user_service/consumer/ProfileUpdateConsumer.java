@@ -7,13 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Component
 public class ProfileUpdateConsumer {
 
-    private ProfileRepo profileRepo;
+    private final ProfileRepo profileRepo;
 
     @Autowired
     public ProfileUpdateConsumer(ProfileRepo profileRepo) {
