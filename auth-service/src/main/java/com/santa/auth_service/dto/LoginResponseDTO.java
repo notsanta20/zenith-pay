@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class LoginResponseDTO {
-    private String userId;
-    private String email;
+    private String message;
     private boolean isActive;
 }

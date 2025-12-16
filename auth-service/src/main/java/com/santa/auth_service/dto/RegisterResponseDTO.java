@@ -6,6 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RegisterResponseDTO {
-    private String uuid;
     private String message;
 }
