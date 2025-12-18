@@ -26,11 +26,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
-            String email = null;
-            String userId = null;
-
             if (validator.isSecured.test(exchange.getRequest())) {
                 String token;
+                String email = null;
+                String userId = null;
 
                 if (exchange.getRequest().getCookies().containsKey("authToken")) {
                     token = exchange.getRequest().getCookies().get("authToken").getFirst().getValue();
@@ -44,20 +43,23 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 Claims claims = jwtUtil.extractAllClaims(token);
                 email = jwtUtil.extractEmail(token);
                 userId = claims.get("userId").toString();
+
+                ServerHttpRequest mutatedReq = exchange.getRequest()
+                        .mutate()
+                        .header("userEmail", email)
+                        .header("userId", userId)
+                        .build();
+
+
+                ServerWebExchange mutatedExchange = exchange.mutate()
+                        .request(mutatedReq)
+                        .build();
+
+                return chain.filter(mutatedExchange);
+
             }
 
-            ServerHttpRequest mutatedReq = exchange.getRequest()
-                            .mutate()
-                                    .header("userEmail", email)
-                                            .header("userId", userId)
-                                                    .build();
-
-
-            ServerWebExchange mutatedExchange = exchange.mutate()
-                    .request(mutatedReq)
-                    .build();
-
-            return chain.filter(mutatedExchange);
+            return chain.filter(exchange);
         });
     }
 
