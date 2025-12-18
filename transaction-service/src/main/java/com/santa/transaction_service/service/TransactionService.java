@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -85,5 +87,26 @@ public class TransactionService {
         depositMoney(creditReq);
 
         return new TransactResponseDTO(debitRes, req.getFromAccountNumber(), req.getToAccountNumber());
+    }
+
+    public List<Transaction> getAllUserTransactions(String userId, String limited) {
+        List<Transaction> res;
+        Pageable pageable = PageRequest.of(0, 10);
+        List<String> accountNumbers = accountInterface.getAllAccountNumbers(userId);
+
+        Page<Transaction> allTransactions = transactionRepo.findAllByUserId(accountNumbers, pageable);
+
+        if(limited == null){
+            res = allTransactions.stream()
+                    .toList();
+        }
+        else{
+            res = allTransactions.stream()
+                    .limit(6)
+                    .toList();
+        }
+
+
+        return res;
     }
 }
