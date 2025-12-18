@@ -5,8 +5,7 @@ import lombok.Data;
 
 @Data
 public class AccountCreationRequestDTO {
-    private String userId;
-    private String bankName;
+    private String accountName;
     private String accountType;
     private double balance;
 }

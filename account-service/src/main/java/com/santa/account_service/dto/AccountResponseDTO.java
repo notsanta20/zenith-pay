@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 public class AccountResponseDTO {
     private UUID accountId;
-    private String bankName;
+    private String accountName;
     private String accountNumber;
     private String ifscCode;
     private AccountType accountType;
@@ -19,7 +19,7 @@ public class AccountResponseDTO {
 
     public AccountResponseDTO(Account account) {
         this.accountId = account.getAccountId();
-        this.bankName = account.getBankName();
+        this.accountName = account.getBankName();
         this.accountNumber = account.getAccountNumber();
         this.ifscCode = account.getIfscCode();
         this.accountType = account.getAccountType();

@@ -4,8 +4,7 @@ import lombok.Data;
 
 @Data
 public class TransactionRequestDTO {
-    private String accountId;
-    private String txnId;
+    private String accountNumber;
     private double amount;
-    private String type;
+    private String transactionType;
 }

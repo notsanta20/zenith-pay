@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class UpdateStatusRequestDTO {
+    private String accountId;
     private String status;
 }
