@@ -29,8 +29,8 @@ public class ProfileService {
         return profileRepo.findById(id).orElseThrow(()->new ProfileNotFoundException(id.toString()));
     }
 
-    public ProfileUpdateResponseDTO updateUser(ProfileUpdateRequestDTO req){
-        Profile currentUser = getProfile(UUID.fromString(req.getUserId()));
+    public ProfileUpdateResponseDTO updateUser(ProfileUpdateRequestDTO req,String userId){
+        Profile currentUser = getProfile(UUID.fromString(userId));
 
         currentUser.setFull_name(req.getFullName());
         currentUser.setDob(LocalDate.parse(req.getDob()));
@@ -39,7 +39,7 @@ public class ProfileService {
         currentUser.setUpdated_at(LocalDateTime.now());
 
         profileRepo.save(currentUser);
-        activateAccountProducer.activateAccount(req.getUserId());
+        activateAccountProducer.activateAccount(userId);
 
 
         return new ProfileUpdateResponseDTO("Profile has been updated", currentUser.isKyc_status());
@@ -49,5 +49,11 @@ public class ProfileService {
         Profile profile = getProfile(UUID.fromString(userId));
 
         return profile.isKyc_status();
+    }
+
+    public String getUsername(String userId) {
+        Profile profile = getProfile(UUID.fromString(userId));
+
+        return profile.getFull_name();
     }
 }

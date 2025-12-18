@@ -10,5 +10,8 @@ public interface ProfileInterface {
     @GetMapping("api/profile/kyc-status")
     public boolean checkKycStatus(@RequestHeader("userId") String userId);
 
+    @GetMapping("api/profile/username")
+    public String getUsername(@RequestHeader("userId") String userId);
+
 }
 

@@ -29,13 +29,18 @@ public class ProfileController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ProfileUpdateResponseDTO> updateProfile(@RequestBody ProfileUpdateRequestDTO req){
-        ProfileUpdateResponseDTO updatedUser = profileService.updateUser(req);
+    public ResponseEntity<ProfileUpdateResponseDTO> updateProfile(@RequestBody ProfileUpdateRequestDTO req, @RequestHeader("userId") String userId){
+        ProfileUpdateResponseDTO updatedUser = profileService.updateUser(req,userId);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @GetMapping("/kyc-status")
     public boolean checkKycStatus(@RequestHeader("userId") String userId){
         return profileService.getKycStatus(userId);
+    }
+
+    @GetMapping("/username")
+    public String getUsername(@RequestHeader("userId") String userId){
+        return profileService.getUsername(userId);
     }
 }
