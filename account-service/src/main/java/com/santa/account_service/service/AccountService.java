@@ -30,15 +30,16 @@ public class AccountService {
         this.profileUpdateProducer = profileUpdateProducer;
     }
 
-    public AccountResponseDTO createAccount(AccountCreationRequestDTO req) {
-        int totalAccounts = getTotalAccounts(req.getUserId());
+    public AccountResponseDTO createAccount(AccountCreationRequestDTO req, String userId) {
+        int totalAccounts = getTotalAccounts(userId);
 
         String accountNumber = LongNumberGenerator.getID(12);
         String ifsc = LongNumberGenerator.getID(10);
 
+        System.out.println(req.getAccountName());
         Account account = Account.builder()
-                .userId(UUID.fromString(req.getUserId()))
-                .bankName(req.getBankName())
+                .userId(UUID.fromString(userId))
+                .bankName(req.getAccountName())
                 .accountNumber(accountNumber)
                 .ifscCode(ifsc)
                 .accountType(AccountType.valueOf(req.getAccountType()))
@@ -51,7 +52,7 @@ public class AccountService {
         accountRepo.save(account);
 
         if(totalAccounts == 0){
-            profileUpdateProducer.updateProfile(req.getUserId());
+            profileUpdateProducer.updateProfile(userId);
         }
 
         return new AccountResponseDTO(account);
@@ -78,8 +79,8 @@ public class AccountService {
     }
 
 
-    public AccountResponseDTO updateAccountStatus(String accountId, UpdateStatusRequestDTO req) {
-        Account account = accountRepo.findById(UUID.fromString(accountId)).orElseThrow(()->new AccountNotFoundException(accountId));
+    public AccountResponseDTO updateAccountStatus(UpdateStatusRequestDTO req) {
+        Account account = accountRepo.findById(UUID.fromString(req.getAccountId())).orElseThrow(()->new AccountNotFoundException(req.getAccountId()));
 
         account.setAccountStatus(AccountStatus.valueOf(req.getStatus()));
         accountRepo.save(account);
@@ -87,19 +88,19 @@ public class AccountService {
         return new AccountResponseDTO(account);
     }
 
-    public TransactionResponseDTO updateAccountBalance(String accountId, TransactionRequestDTO req) {
-        Account account = accountRepo.findById(UUID.fromString(accountId)).orElseThrow(()->new AccountNotFoundException(accountId));
+    public TransactionResponseDTO updateAccountBalance(TransactionRequestDTO req) {
+        Account account = accountRepo.findByAccountNumber(req.getAccountNumber()).orElseThrow(()->new AccountNotFoundException(req.getAccountNumber()));
 
         double currentBal = account.getBalance();
 
-        if(req.getType().equals("DEBIT")){
+        if(req.getTransactionType().equals("DEBIT")){
             if(currentBal < req.getAmount()){
                 throw new InsufficientBalanceException(currentBal);
             }
 
             account.setBalance(currentBal-req.getAmount());
         }
-        else if(req.getType().equals("CREDIT")){
+        else if(req.getTransactionType().equals("CREDIT")){
             account.setBalance(currentBal + req.getAmount());
         }
 
