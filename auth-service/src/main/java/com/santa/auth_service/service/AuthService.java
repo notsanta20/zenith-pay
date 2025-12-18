@@ -76,10 +76,14 @@ public class AuthService {
 
             String token = jwtService.generateToken(user.getEmail(), user.getId().toString());
 
+            user.setLastLoginAt(LocalDateTime.now());
+
+            userRepo.save(user);
+
             return LoginRes.builder()
                     .accessToken(token)
                     .refreshToken("asdf")
-                    .expiry(1000 * 60 * 2)
+                    .expiry(1000 * 60 * 20)
                     .userId(user.getId().toString())
                     .email(user.getEmail())
                     .isActive(user.isActive())
@@ -94,14 +98,16 @@ public class AuthService {
     public VerifyUserResponseDTO verifyUser(String userID) {
         User user = userRepo.findById(UUID.fromString(userID)).orElseThrow(()->new UserNotFoundException(userID));
 
-        return new VerifyUserResponseDTO("user is Authenticated", user.isActive());
+        return new VerifyUserResponseDTO("user is Authenticated", true);
     }
 
-    public UserBootstrapDTO userBootstrap(String userID) {
-        User user = userRepo.findById(UUID.fromString(userID)).orElseThrow(()->new UserNotFoundException(userID));
-        boolean kycStatus = profileInterface.checkKycStatus(userID);
-        int totalAccounts = accountInterface.getTotalAccount(userID);
+    public UserBootstrapDTO userBootstrap(String userId) {
+        User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(()->new UserNotFoundException(userId));
+        boolean kycStatus = profileInterface.checkKycStatus(userId);
+        int totalAccounts = accountInterface.getTotalAccount(userId);
+        String username = profileInterface.getUsername(userId);
 
-        return new UserBootstrapDTO(user.isActive(), kycStatus, totalAccounts);
+
+        return new UserBootstrapDTO(user.isActive(), kycStatus, totalAccounts, username, user.getLastLoginAt());
     }
 }
