@@ -19,7 +19,7 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID txnId;
-    private UUID accountId;
+    private String accountNumber;
     private TransactionType type;
     private double amount;
     private String reference;
