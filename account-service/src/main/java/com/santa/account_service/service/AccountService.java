@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -121,5 +122,15 @@ public class AccountService {
         Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId),pageable);
 
         return (int) accounts.getTotalElements();
+    }
+
+    public List<String> getAllAccountNumbers(String userId) {
+        Pageable pageable = PageRequest.of(0,10);
+
+        Page<Account> allAccounts = accountRepo.findAllByUserId(UUID.fromString(userId), pageable);
+
+        return allAccounts.stream()
+                .map(Account::getAccountNumber)
+                .toList();
     }
 }

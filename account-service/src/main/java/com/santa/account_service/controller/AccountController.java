@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
@@ -69,5 +71,10 @@ public class AccountController {
     @GetMapping("/total-accounts")
     public int getTotalAccount(@RequestHeader("userId") String userId){
         return accountService.getTotalAccounts(userId);
+    }
+
+    @GetMapping("/all-account-numbers")
+    public List<String> getAllAccountNumbers(@RequestHeader("userId") String userId){
+        return accountService.getAllAccountNumbers(userId);
     }
 }
