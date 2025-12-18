@@ -30,8 +30,8 @@ public class TransactionService {
 
     public DepositResponseDTO depositMoney(DepositRequestDTO req) {
         Transaction transaction = Transaction.builder()
-                .accountId(UUID.fromString(req.getAccountId()))
-                .type(TransactionType.valueOf(req.getType()))
+                .accountNumber(req.getAccountNumber())
+                .type(TransactionType.valueOf(req.getTransactionType()))
                 .amount(req.getAmount())
                 .reference(req.getReference())
                 .status(TransactionStatus.PENDING)
@@ -39,30 +39,51 @@ public class TransactionService {
                 .remarks(req.getRemarks())
                 .build();
 
-        transactionRepo.save(transaction);
-
         TransactionRequestDTO transactionRequestDTO = TransactionRequestDTO.builder()
-                        .accountId(req.getAccountId())
-                                .txnId(transaction.getTxnId().toString())
-                                        .amount(transaction.getAmount())
-                                                .type(transaction.getType().toString())
-                                                        .build();
+                .accountNumber(req.getAccountNumber())
+                .amount(transaction.getAmount())
+                .transactionType(transaction.getType().toString())
+                .build();
 
-        ResponseEntity<TransactionResponseDTO> res = accountInterface.updateAccountBalance(
-                req.getAccountId(), transactionRequestDTO);
+        ResponseEntity<TransactionResponseDTO> res = accountInterface.updateAccountBalance(transactionRequestDTO);
 
-        if(res.getStatusCode().value() == 200){
+        if (res.getStatusCode().value() == 200) {
             transaction.setStatus(TransactionStatus.SUCCESS);
-        }else{
+        } else {
             transaction.setStatus(TransactionStatus.FAILED);
         }
 
-     return new DepositResponseDTO(transaction,res.getBody().getBalance());
+        transactionRepo.save(transaction);
+
+        return new DepositResponseDTO(transaction, res.getBody().getBalance());
     }
 
-    public Page<Transaction> getAllTransactions(String accountId, int page, int size) {
-        Pageable pageable = PageRequest.of(page,size);
+    public Page<Transaction> getAllTransactions(String accountNumber, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        return transactionRepo.findAllByAccountId(UUID.fromString(accountId),pageable);
+        return transactionRepo.findAllByAccountNumber(accountNumber, pageable);
+    }
+
+    public TransactResponseDTO transact(TransactRequestDTO req) {
+        DepositRequestDTO debitReq = DepositRequestDTO.builder()
+                .accountNumber(req.getFromAccountNumber())
+                .transactionType("DEBIT")
+                .amount(req.getAmount())
+                .reference("test transactions")
+                .remarks("testing")
+                .build();
+
+        DepositRequestDTO creditReq = DepositRequestDTO.builder()
+                .accountNumber(req.getToAccountNumber())
+                .transactionType("CREDIT")
+                .amount(req.getAmount())
+                .reference("test transactions")
+                .remarks("testing")
+                .build();
+
+        DepositResponseDTO debitRes = depositMoney(debitReq);
+        depositMoney(creditReq);
+
+        return new TransactResponseDTO(debitRes, req.getFromAccountNumber(), req.getToAccountNumber());
     }
 }
