@@ -20,8 +20,8 @@ public class AccountController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<AccountResponseDTO> createAccount(@RequestBody AccountCreationRequestDTO req){
-        AccountResponseDTO res = accountService.createAccount(req);
+    public ResponseEntity<AccountResponseDTO> createAccount(@RequestBody AccountCreationRequestDTO req, @RequestHeader("userId") String userId){
+        AccountResponseDTO res = accountService.createAccount(req, userId);
 
         return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
@@ -33,32 +33,30 @@ public class AccountController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userId}/total-balance")
-    public ResponseEntity<Double> getTotalBalance(@PathVariable String userId){
+    @GetMapping("/user/total-balance")
+    public ResponseEntity<Double> getTotalBalance(@RequestHeader("userId") String userId){
         double res = accountService.getTotalBalance(userId);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @PatchMapping("/{accountId}")
+    @PatchMapping("/update-status")
     public ResponseEntity<AccountResponseDTO> updateAccountStatus(
-            @PathVariable String accountId,
             @RequestBody UpdateStatusRequestDTO req){
-        AccountResponseDTO res = accountService.updateAccountStatus(accountId,req);
+        AccountResponseDTO res = accountService.updateAccountStatus(req);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @PutMapping("/{accountId}/transact")
+    @PutMapping("/transact")
     public ResponseEntity<TransactionResponseDTO> updateAccountBalance(
-            @PathVariable String accountId,
             @RequestBody TransactionRequestDTO req){
-        TransactionResponseDTO res = accountService.updateAccountBalance(accountId,req);
+        TransactionResponseDTO res = accountService.updateAccountBalance(req);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
-    @GetMapping("/user")
+    @GetMapping("/all-accounts")
     public ResponseEntity<Page<AccountResponseDTO>> getAllAccounts(
             @RequestHeader("userId") String userId,
             @RequestParam(defaultValue = "0") int page,
