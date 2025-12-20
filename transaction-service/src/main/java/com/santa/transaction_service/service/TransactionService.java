@@ -1,15 +1,19 @@
 package com.santa.transaction_service.service;
 
 import com.santa.transaction_service.dto.*;
+import com.santa.transaction_service.exception.AccountNotFoundException;
+import com.santa.transaction_service.exception.InsufficientBalanceException;
 import com.santa.transaction_service.feign.AccountInterface;
 import com.santa.transaction_service.model.Transaction;
 import com.santa.transaction_service.model.TransactionStatus;
 import com.santa.transaction_service.model.TransactionType;
 import com.santa.transaction_service.repo.TransactionRepo;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +38,12 @@ public class TransactionService {
                 .type(TransactionType.valueOf(req.getTransactionType()))
                 .amount(req.getAmount())
                 .reference(req.getReference())
-                .status(TransactionStatus.PENDING)
+                .status(TransactionStatus.FAILED)
                 .timestamp(LocalDateTime.now())
                 .remarks(req.getRemarks())
                 .build();
+
+        transactionRepo.save(transaction);
 
         TransactionRequestDTO transactionRequestDTO = TransactionRequestDTO.builder()
                 .accountNumber(req.getAccountNumber())
@@ -45,23 +51,28 @@ public class TransactionService {
                 .transactionType(transaction.getType().toString())
                 .build();
 
-        ResponseEntity<TransactionResponseDTO> res = accountInterface.updateAccountBalance(transactionRequestDTO);
+        double balance = 0.0;
+        try {
+            ResponseEntity<TransactionResponseDTO> res = accountInterface.updateAccountBalance(transactionRequestDTO);
+            balance = res.getBody().getBalance();
 
-        if (res.getStatusCode().value() == 200) {
             transaction.setStatus(TransactionStatus.SUCCESS);
-        } else {
-            transaction.setStatus(TransactionStatus.FAILED);
+            transactionRepo.save(transaction);
+            return new DepositResponseDTO(transaction, balance);
+
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                throw new AccountNotFoundException(req.getAccountNumber());
+            } else if (e.status() == HttpStatus.BAD_REQUEST.value()) {
+                throw new InsufficientBalanceException(e.getMessage());
+            }
+
+            throw new RuntimeException("Internal server error");
         }
-
-        transactionRepo.save(transaction);
-
-        return new DepositResponseDTO(transaction, res.getBody().getBalance());
     }
 
-    public Page<Transaction> getAllTransactions(String accountNumber, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        return transactionRepo.findAllByAccountNumber(accountNumber, pageable);
+    public List<Transaction> getAllTransactions(String accountNumber) {
+        return transactionRepo.findAllByAccountNumber(accountNumber);
     }
 
     public TransactResponseDTO transact(TransactRequestDTO req) {
@@ -89,16 +100,14 @@ public class TransactionService {
 
     public List<Transaction> getAllUserTransactions(String userId, String limited) {
         List<Transaction> res;
-        Pageable pageable = PageRequest.of(0, 10);
         List<String> accountNumbers = accountInterface.getAllAccountNumbers(userId);
 
-        Page<Transaction> allTransactions = transactionRepo.findAllByUserId(accountNumbers, pageable);
+        List<Transaction> allTransactions = transactionRepo.findAllByUserId(accountNumbers);
 
-        if(limited == null){
+        if (limited == null) {
             res = allTransactions.stream()
                     .toList();
-        }
-        else{
+        } else {
             res = allTransactions.stream()
                     .limit(6)
                     .toList();
