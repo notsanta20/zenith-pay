@@ -35,11 +35,8 @@ public class TransactionController {
     }
 
     @GetMapping("/all-transactions/{accountNumber}")
-    public ResponseEntity<Page<Transaction>> getAllTransactions(
-            @PathVariable String accountNumber,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size){
-        Page<Transaction> res = transactionService.getAllTransactions(accountNumber, page, size);
+    public ResponseEntity<List<Transaction>> getAllTransactions(@PathVariable String accountNumber){
+        List<Transaction> res = transactionService.getAllTransactions(accountNumber);
 
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
