@@ -67,3 +67,4 @@ projectNotesV2.txt
 /.idea/
 
 /src/main/resources/data.sql
+.env
