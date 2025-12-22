@@ -5,6 +5,7 @@ import com.santa.auth_service.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
+    private final boolean secureCookie;
 
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, @Value("${secure.cookie}") boolean isSecure) {
         this.authService = authService;
+        secureCookie = isSecure;
     }
 
     @PostMapping("/register")
@@ -42,6 +45,7 @@ public class AuthController {
                 .path("/")
                 .maxAge(auth.getExpiry())
                 .sameSite(SameSiteCookies.STRICT.toString())
+                .secure(secureCookie)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());
@@ -84,6 +88,7 @@ public class AuthController {
                 .path("/")
                 .maxAge(0)
                 .sameSite(SameSiteCookies.STRICT.toString())
+                .secure(secureCookie)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());

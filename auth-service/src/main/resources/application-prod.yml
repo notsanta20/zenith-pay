@@ -13,3 +13,6 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://host.docker.internal:8761/eureka/
+
+secure:
+  cookie: true
