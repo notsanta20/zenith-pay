@@ -23,6 +23,8 @@ public class ProfileCreationConsumer {
     public void createProfile(String userId){
         Profile profile = Profile.builder()
                 .user_id(UUID.fromString(userId))
+                .securityNotifications(true)
+                .generalNotifications(true)
                 .created_at(LocalDateTime.now())
                 .updated_at(LocalDateTime.now())
                 .build();
