@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/account-service
+
+  kafka:
+    producer:
+      bootstrap-servers: kafka:9092
+
+    consumer:
+      bootstrap-servers: kafka:9092
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://host.docker.internal:8761/eureka/

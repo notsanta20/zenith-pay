@@ -5,12 +5,14 @@ spring:
   application:
     name: account-service
 
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+
   config:
     import: optional:file:.env[.properties]
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/bank_app
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
@@ -21,12 +23,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-  kafka:
-    producer:
-      bootstrap-servers: localhost:29092
-
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://h₹ost.docker.internal:8761/eureka/
