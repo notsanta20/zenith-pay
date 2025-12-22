@@ -68,4 +68,26 @@ public class AuthController {
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
+
+    @PutMapping("/update-password")
+    public ResponseEntity<String> updatePassword(@RequestHeader("userId") String userId, @RequestBody UpdatePasswordDTO req) {
+        authService.updatePassword(userId,req);
+
+        return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+
+        ResponseCookie authCookie = ResponseCookie.from("authToken", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite(SameSiteCookies.STRICT.toString())
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());
+
+        return new ResponseEntity<>("logged out successfully", HttpStatus.OK);
+    }
 }
