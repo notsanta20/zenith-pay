@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 public class UserBootstrapDTO {
     private boolean isActive;
     private boolean kycStatus;
+    private boolean securityNotifications;
+    private boolean generalNotifications;
     private int accountCount;
     private String username;
     private LocalDateTime lastLoginAt;
