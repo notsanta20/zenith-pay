@@ -1,7 +1,6 @@
 package com.santa.user_service.service;
 
-import com.santa.user_service.dto.ProfileUpdateRequestDTO;
-import com.santa.user_service.dto.ProfileUpdateResponseDTO;
+import com.santa.user_service.dto.*;
 import com.santa.user_service.exception.ProfileNotFoundException;
 import com.santa.user_service.model.Profile;
 import com.santa.user_service.producer.ActivateAccountProducer;
@@ -25,12 +24,18 @@ public class ProfileService {
         this.activateAccountProducer = activateAccountProducer;
     }
 
-    public Profile getProfile(UUID id){
-        return profileRepo.findById(id).orElseThrow(()->new ProfileNotFoundException(id.toString()));
+    private Profile getProfileFunc(String userId){
+        return profileRepo.findById(UUID.fromString(userId)).orElseThrow(()->new ProfileNotFoundException(userId));
+    }
+
+    public ProfileDTO getProfile(String userId){
+        Profile profile = getProfileFunc(userId);
+
+        return new ProfileDTO(profile);
     }
 
     public ProfileUpdateResponseDTO updateUser(ProfileUpdateRequestDTO req,String userId){
-        Profile currentUser = getProfile(UUID.fromString(userId));
+        Profile currentUser = getProfileFunc(userId);
 
         currentUser.setFull_name(req.getFullName());
         currentUser.setDob(LocalDate.parse(req.getDob()));
@@ -45,15 +50,32 @@ public class ProfileService {
         return new ProfileUpdateResponseDTO("Profile has been updated", currentUser.isKyc_status());
     }
 
-    public boolean getKycStatus(String userId) {
-        Profile profile = getProfile(UUID.fromString(userId));
+    public UserStatusDTO getUserStatus(String userId) {
+        Profile profile = getProfileFunc(userId);
 
-        return profile.isKyc_status();
+        return new UserStatusDTO(profile.isKyc_status(), profile.isSecurityNotifications(), profile.isGeneralNotifications());
     }
 
     public String getUsername(String userId) {
-        Profile profile = getProfile(UUID.fromString(userId));
+        Profile profile = getProfileFunc(userId);
 
         return profile.getFull_name();
+    }
+
+    public void updateSecurityNotification(String userId) {
+        Profile user = getProfileFunc(userId);
+
+        user.setSecurityNotifications(!user.isSecurityNotifications());
+
+        profileRepo.save(user);
+    }
+
+    public void updateGeneralNotification(String userId) {
+        Profile user = getProfileFunc(userId);
+
+        user.setGeneralNotifications(!user.isGeneralNotifications());
+
+        profileRepo.save(user);
+
     }
 }
