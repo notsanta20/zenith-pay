@@ -23,6 +23,8 @@ public class Profile {
     private LocalDate dob;
     private String phone;
     private boolean kyc_status;
+    private boolean securityNotifications;
+    private boolean generalNotifications;
     private LocalDateTime created_at;
     private LocalDateTime updated_at;
 }
