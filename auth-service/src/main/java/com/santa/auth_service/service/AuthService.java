@@ -3,6 +3,7 @@ package com.santa.auth_service.service;
 import com.santa.auth_service.config.jwt.JwtService;
 import com.santa.auth_service.dto.*;
 import com.santa.auth_service.exception.EmailAlreadyExistsException;
+import com.santa.auth_service.exception.SamePasswordException;
 import com.santa.auth_service.exception.UnAuthorizedException;
 import com.santa.auth_service.exception.UserNotFoundException;
 import com.santa.auth_service.feign.AccountInterface;
@@ -76,7 +77,8 @@ public class AuthService {
 
             String token = jwtService.generateToken(user.getEmail(), user.getId().toString());
 
-            user.setLastLoginAt(LocalDateTime.now());
+            user.setLastLoginAt(user.getUpdatedAt());
+            user.setUpdatedAt(LocalDateTime.now());
 
             userRepo.save(user);
 
@@ -103,11 +105,22 @@ public class AuthService {
 
     public UserBootstrapDTO userBootstrap(String userId) {
         User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(()->new UserNotFoundException(userId));
-        boolean kycStatus = profileInterface.checkKycStatus(userId);
+        UserStatusDTO userStatus = profileInterface.getUserStatus(userId);
         int totalAccounts = accountInterface.getTotalAccount(userId);
         String username = profileInterface.getUsername(userId);
 
 
-        return new UserBootstrapDTO(user.isActive(), kycStatus, totalAccounts, username, user.getLastLoginAt());
+        return new UserBootstrapDTO(user.isActive(), userStatus.isKyc_status(),userStatus.isSecurityNotifications(), userStatus.isGeneralNotifications(), totalAccounts, username, user.getLastLoginAt());
+    }
+
+    public void updatePassword(String userId, UpdatePasswordDTO req) {
+        User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(()-> new UserNotFoundException("No user found for Password change"));
+
+        if(encoder.matches(req.getPassword(), user.getPasswordHash())){
+            throw new SamePasswordException();
+        }
+
+        user.setPasswordHash(encoder.encode(req.getPassword()));
+        userRepo.save(user);
     }
 }
