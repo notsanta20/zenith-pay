@@ -6,6 +6,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "22181:2181"
+    networks:
+      - zenith-network
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
@@ -20,6 +22,21 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_RETENTION_MS: 43200000
+    networks:
+      - zenith-network
+
+  kafka-create-topics:
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      - kafka
+    hostname: kafka-create-topics
+    command: ["bash", "./create-topics.sh"]
+    working_dir: /scripts
+    volumes:
+      - ./scripts:/scripts
+    networks:
+      - zenith-network
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -30,3 +47,83 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     depends_on:
       - kafka
+    networks:
+      - zenith-network
+
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./:/docker-entrypoint-initdb.d
+    networks:
+      - zenith-network
+
+  service-registry:
+    build: service-registry/
+    ports:
+      - "8761:8761"
+    networks:
+      - zenith-network
+
+  api-gateway:
+    build: api-gateway/
+    ports:
+      - "8089:8089"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - zenith-network
+
+  auth-service:
+    build: auth-service/
+    ports:
+      - "8081:8081"
+    environment:
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    networks:
+      - zenith-network
+
+  profile-service:
+    build: user-service/
+    ports:
+      - "8082:8082"
+    environment:
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    networks:
+      - zenith-network
+
+  account-service:
+    build: account-service/
+    ports:
+      - "8083:8083"
+    environment:
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    networks:
+      - zenith-network
+
+  transaction-service:
+    build: transaction-service/
+    ports:
+      - "8084:8084"
+    environment:
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    networks:
+      - zenith-network
+
+networks:
+  zenith-network:
+    driver: bridge
