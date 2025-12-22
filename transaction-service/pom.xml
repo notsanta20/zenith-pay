@@ -99,7 +99,8 @@
 	</dependencyManagement>
 
 	<build>
-		<plugins>
+        <finalName>transaction-service</finalName>
+        <plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
