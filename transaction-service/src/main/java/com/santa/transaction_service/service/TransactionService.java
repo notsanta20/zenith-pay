@@ -80,16 +80,16 @@ public class TransactionService {
                 .accountNumber(req.getFromAccountNumber())
                 .transactionType("DEBIT")
                 .amount(req.getAmount())
-                .reference("test transactions")
-                .remarks("testing")
+                .reference("transacting from **** **** %s to **** **** %s".formatted(req.getFromAccountNumber().substring(8), req.getToAccountNumber().substring(8)))
+                .remarks(req.getRemarks())
                 .build();
 
         DepositRequestDTO creditReq = DepositRequestDTO.builder()
                 .accountNumber(req.getToAccountNumber())
                 .transactionType("CREDIT")
                 .amount(req.getAmount())
-                .reference("test transactions")
-                .remarks("testing")
+                .reference("received from **** **** %s to **** **** %s".formatted(req.getFromAccountNumber().substring(8), req.getToAccountNumber().substring(8)))
+                .remarks(req.getRemarks())
                 .build();
 
         DepositResponseDTO debitRes = depositMoney(debitReq);
