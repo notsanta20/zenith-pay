@@ -1,6 +1,9 @@
 package com.santa.auth_service.controller;
 
 import com.santa.auth_service.dto.*;
+import com.santa.auth_service.model.LogLevel;
+import com.santa.auth_service.model.LogServiceType;
+import com.santa.auth_service.producer.LogProducer;
 import com.santa.auth_service.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.SameSiteCookies;
@@ -17,16 +20,26 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
     private final boolean secureCookie;
+    private final LogProducer logProducer;
 
     @Autowired
-    public AuthController(AuthService authService, @Value("${secure.cookie}") boolean isSecure) {
+    public AuthController(AuthService authService, @Value("${secure.cookie}") boolean isSecure, LogProducer logProducer) {
         this.authService = authService;
-        secureCookie = isSecure;
+        this.secureCookie = isSecure;
+        this.logProducer = logProducer;
     }
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDTO> registerUser(@RequestBody RegisterRequestDTO req) {
         RegisterResponseDTO res = authService.registerUser(req);
+
+        LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.AUTH)
+                .message("user created.")
+                .build();
+
+        logProducer.createLog(log);
 
         return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
@@ -49,6 +62,14 @@ public class AuthController {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());
+
+        LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.AUTH)
+                .message("user %s, logged in.".formatted(req.getEmail()))
+                .build();
+
+        logProducer.createLog(log);
 
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
@@ -75,7 +96,15 @@ public class AuthController {
 
     @PutMapping("/update-password")
     public ResponseEntity<String> updatePassword(@RequestHeader("userId") String userId, @RequestBody UpdatePasswordDTO req) {
-        authService.updatePassword(userId,req);
+        authService.updatePassword(userId, req);
+
+        LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.AUTH)
+                .message("user %s, password updated.".formatted(userId))
+                .build();
+
+        logProducer.createLog(log);
 
         return new ResponseEntity<>("Password updated successfully", HttpStatus.OK);
     }
@@ -92,6 +121,14 @@ public class AuthController {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, authCookie.toString());
+
+        LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.AUTH)
+                .message("user logged out.")
+                .build();
+
+        logProducer.createLog(log);
 
         return new ResponseEntity<>("logged out successfully", HttpStatus.OK);
     }

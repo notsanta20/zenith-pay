@@ -1,6 +1,10 @@
 package com.santa.user_service.consumer;
 
+import com.santa.user_service.dto.LogDTO;
+import com.santa.user_service.model.LogLevel;
+import com.santa.user_service.model.LogServiceType;
 import com.santa.user_service.model.Profile;
+import com.santa.user_service.producer.LogProducer;
 import com.santa.user_service.repo.ProfileRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,14 +17,16 @@ import java.util.UUID;
 public class ProfileCreationConsumer {
 
     private final ProfileRepo profileRepo;
+    private final LogProducer logProducer;
 
     @Autowired
-    public ProfileCreationConsumer(ProfileRepo profileRepo) {
+    public ProfileCreationConsumer(ProfileRepo profileRepo, LogProducer logProducer) {
         this.profileRepo = profileRepo;
+        this.logProducer = logProducer;
     }
 
     @KafkaListener(topics = "create-profile", groupId = "create-profile-group")
-    public void createProfile(String userId){
+    public void createProfile(String userId) {
         Profile profile = Profile.builder()
                 .user_id(UUID.fromString(userId))
                 .securityNotifications(true)
@@ -30,5 +36,13 @@ public class ProfileCreationConsumer {
                 .build();
 
         profileRepo.save(profile);
+
+        LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.PROFILE)
+                .message("user %s, profile created.".formatted(userId))
+                .build();
+
+        logProducer.createLog(log);
     }
 }

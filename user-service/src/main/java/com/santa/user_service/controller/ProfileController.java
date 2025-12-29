@@ -1,6 +1,9 @@
 package com.santa.user_service.controller;
 
 import com.santa.user_service.dto.*;
+import com.santa.user_service.model.LogLevel;
+import com.santa.user_service.model.LogServiceType;
+import com.santa.user_service.producer.LogProducer;
 import com.santa.user_service.service.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class ProfileController {
 
     private final ProfileService profileService;
+    private final LogProducer logProducer;
 
     @Autowired
-    public ProfileController(ProfileService profileService) {
+    public ProfileController(ProfileService profileService, LogProducer logProducer) {
         this.profileService = profileService;
+        this.logProducer = logProducer;
     }
 
     @GetMapping("/me")
@@ -27,6 +32,15 @@ public class ProfileController {
     @PutMapping("/update")
     public ResponseEntity<ProfileUpdateResponseDTO> updateProfile(@RequestBody ProfileUpdateRequestDTO req, @RequestHeader("userId") String userId) {
         ProfileUpdateResponseDTO updatedUser = profileService.updateUser(req, userId);
+
+        LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.PROFILE)
+                .message("user %s, profile updated.".formatted(userId))
+                .build();
+
+        logProducer.createLog(log);
+
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
@@ -43,12 +57,30 @@ public class ProfileController {
     @PutMapping("/update-security-notification")
     public ResponseEntity<String> updateSecurityNotification(@RequestHeader("userId") String userId) {
         profileService.updateSecurityNotification(userId);
+
+        LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.PROFILE)
+                .message("user %s, security notification updated.".formatted(userId))
+                .build();
+
+        logProducer.createLog(log);
+
         return new ResponseEntity<>("Preference updated successfully", HttpStatus.OK);
     }
 
     @PutMapping("/update-general-notification")
     public ResponseEntity<String> updateGeneralNotification(@RequestHeader("userId") String userId) {
         profileService.updateGeneralNotification(userId);
+
+        LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.PROFILE)
+                .message("user %s, general notification updated.".formatted(userId))
+                .build();
+
+        logProducer.createLog(log);
+
         return new ResponseEntity<>("Preference updated successfully", HttpStatus.OK);
     }
 }

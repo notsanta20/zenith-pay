@@ -1,15 +1,12 @@
 package com.santa.transaction_service.controller;
 
-import com.santa.transaction_service.dto.DepositRequestDTO;
-import com.santa.transaction_service.dto.DepositResponseDTO;
-import com.santa.transaction_service.dto.TransactRequestDTO;
-import com.santa.transaction_service.dto.TransactResponseDTO;
+import com.santa.transaction_service.dto.*;
+import com.santa.transaction_service.model.LogLevel;
+import com.santa.transaction_service.model.LogServiceType;
 import com.santa.transaction_service.model.Transaction;
+import com.santa.transaction_service.producer.LogProducer;
 import com.santa.transaction_service.service.TransactionService;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.QueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +18,25 @@ import java.util.List;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final LogProducer logProducer;
 
     @Autowired
-    public TransactionController(TransactionService transactionService) {
+    public TransactionController(TransactionService transactionService, LogProducer logProducer) {
         this.transactionService = transactionService;
+        this.logProducer = logProducer;
     }
 
     @PostMapping("/deposit")
     public ResponseEntity<DepositResponseDTO> depositMoney(@RequestBody DepositRequestDTO req){
         DepositResponseDTO res = transactionService.depositMoney(req);
+
+                LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.TRANSACTION)
+                .message("transaction made on account number - **** **** %s.".formatted(req.getAccountNumber().substring(8)))
+                .build();
+
+        logProducer.createLog(log);
 
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
@@ -44,6 +51,14 @@ public class TransactionController {
     @PostMapping("/transact")
     public ResponseEntity<TransactResponseDTO> transact(@RequestBody TransactRequestDTO req){
         TransactResponseDTO res = transactionService.transact(req);
+
+                LogDTO log = LogDTO.builder()
+                .logLevel(LogLevel.INFO)
+                .serviceType(LogServiceType.TRANSACTION)
+                .message("transacted from **** **** %s to **** **** %s.".formatted(req.getFromAccountNumber().substring(8),req.getToAccountNumber().substring(8)))
+                .build();
+
+        logProducer.createLog(log);
 
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
