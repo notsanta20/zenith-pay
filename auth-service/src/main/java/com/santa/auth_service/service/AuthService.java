@@ -98,25 +98,25 @@ public class AuthService {
     }
 
     public VerifyUserResponseDTO verifyUser(String userID) {
-        User user = userRepo.findById(UUID.fromString(userID)).orElseThrow(()->new UserNotFoundException(userID));
+        User user = userRepo.findById(UUID.fromString(userID)).orElseThrow(() -> new UserNotFoundException(userID));
 
         return new VerifyUserResponseDTO("user is Authenticated", true);
     }
 
     public UserBootstrapDTO userBootstrap(String userId) {
-        User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(()->new UserNotFoundException(userId));
+        User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(() -> new UserNotFoundException(userId));
         UserStatusDTO userStatus = profileInterface.getUserStatus(userId);
         int totalAccounts = accountInterface.getTotalAccount(userId);
         String username = profileInterface.getUsername(userId);
 
 
-        return new UserBootstrapDTO(user.isActive(), userStatus.isKyc_status(),userStatus.isSecurityNotifications(), userStatus.isGeneralNotifications(), totalAccounts, username, user.getLastLoginAt());
+        return new UserBootstrapDTO(user.isActive(), userStatus.isKyc_status(), userStatus.isSecurityNotifications(), userStatus.isGeneralNotifications(), totalAccounts, username, user.getLastLoginAt());
     }
 
     public void updatePassword(String userId, UpdatePasswordDTO req) {
-        User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(()-> new UserNotFoundException("No user found for Password change"));
+        User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(() -> new UserNotFoundException("No user found for Password change"));
 
-        if(encoder.matches(req.getPassword(), user.getPasswordHash())){
+        if (encoder.matches(req.getPassword(), user.getPasswordHash())) {
             throw new SamePasswordException();
         }
 
