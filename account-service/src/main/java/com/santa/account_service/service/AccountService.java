@@ -37,7 +37,6 @@ public class AccountService {
         String accountNumber = LongNumberGenerator.getID(12);
         String ifsc = LongNumberGenerator.getID(10);
 
-        System.out.println(req.getAccountName());
         Account account = Account.builder()
                 .userId(UUID.fromString(userId))
                 .bankName(req.getAccountName())
@@ -52,7 +51,7 @@ public class AccountService {
 
         accountRepo.save(account);
 
-        if(totalAccounts == 0){
+        if (totalAccounts == 0) {
             profileUpdateProducer.updateProfile(userId);
         }
 
@@ -60,28 +59,28 @@ public class AccountService {
     }
 
     public AccountResponseDTO getAccount(String id) {
-        Account account = accountRepo.findById(UUID.fromString(id)).orElseThrow(()->new AccountNotFoundException(id));
+        Account account = accountRepo.findById(UUID.fromString(id)).orElseThrow(() -> new AccountNotFoundException(id));
 
         return new AccountResponseDTO(account);
     }
 
     public double getTotalBalance(String userId) {
-        Pageable pageable = PageRequest.of(0,10);
-        Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId),pageable);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId), pageable);
 
-        if(!accounts.hasContent()){
+        if (!accounts.hasContent()) {
             throw new AccountNotFoundException(userId);
         }
 
         return accounts.stream()
-                        .map(Account::getBalance)
-                                .reduce(0.0,(a,e)-> a+=e);
+                .map(Account::getBalance)
+                .reduce(0.0, (a, e) -> a += e);
 
     }
 
 
     public AccountResponseDTO updateAccountStatus(UpdateStatusRequestDTO req) {
-        Account account = accountRepo.findById(UUID.fromString(req.getAccountId())).orElseThrow(()->new AccountNotFoundException(req.getAccountId()));
+        Account account = accountRepo.findById(UUID.fromString(req.getAccountId())).orElseThrow(() -> new AccountNotFoundException(req.getAccountId()));
 
         account.setAccountStatus(AccountStatus.valueOf(req.getStatus()));
         accountRepo.save(account);
@@ -90,18 +89,17 @@ public class AccountService {
     }
 
     public TransactionResponseDTO updateAccountBalance(TransactionRequestDTO req) {
-        Account account = accountRepo.findByAccountNumber(req.getAccountNumber()).orElseThrow(()->new AccountNotFoundException(req.getAccountNumber()));
+        Account account = accountRepo.findByAccountNumber(req.getAccountNumber()).orElseThrow(() -> new AccountNotFoundException(req.getAccountNumber()));
 
         double currentBal = account.getBalance();
 
-        if(req.getTransactionType().equals("DEBIT")){
-            if(currentBal < req.getAmount()){
+        if (req.getTransactionType().equals("DEBIT")) {
+            if (currentBal < req.getAmount()) {
                 throw new InsufficientBalanceException(currentBal);
             }
 
-            account.setBalance(currentBal-req.getAmount());
-        }
-        else if(req.getTransactionType().equals("CREDIT")){
+            account.setBalance(currentBal - req.getAmount());
+        } else if (req.getTransactionType().equals("CREDIT")) {
             account.setBalance(currentBal + req.getAmount());
         }
 
@@ -111,21 +109,21 @@ public class AccountService {
     }
 
     public Page<AccountResponseDTO> getAllAccounts(String userId, int page, int size) {
-        Pageable pageable = PageRequest.of(page,size);
-        Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId),pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId), pageable);
 
         return accounts.map(AccountResponseDTO::new);
     }
 
     public int getTotalAccounts(String userId) {
-        Pageable pageable = PageRequest.of(0,10);
-        Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId),pageable);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Account> accounts = accountRepo.findAllByUserId(UUID.fromString(userId), pageable);
 
         return (int) accounts.getTotalElements();
     }
 
     public List<String> getAllAccountNumbers(String userId) {
-        Pageable pageable = PageRequest.of(0,10);
+        Pageable pageable = PageRequest.of(0, 10);
 
         Page<Account> allAccounts = accountRepo.findAllByUserId(UUID.fromString(userId), pageable);
 
