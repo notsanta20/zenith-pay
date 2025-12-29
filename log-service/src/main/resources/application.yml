@@ -1,0 +1,33 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: log-service
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
+
+  mongodb:
+    database: bank
+    auto-index-creation: true
+
+  kafka:
+    consumer:
+      group-id: create-log-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            use:
+              type:
+                headers: false
+            value:
+              default:
+                type: com.santa.log_service.dto.LogDTO
+            trusted:
+              packages: com.santa.log_service.dto
+
+  config:
+    import: optional:file:.env[.properties]

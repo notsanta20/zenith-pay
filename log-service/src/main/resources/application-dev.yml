@@ -1,0 +1,10 @@
+spring:
+  mongodb:
+    uri: mongodb://localhost:27017
+
+  kafka:
+    producer:
+      bootstrap-servers: localhost:29092
+
+    consumer:
+      bootstrap-servers: localhost:29092
