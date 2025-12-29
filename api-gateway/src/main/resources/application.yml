@@ -61,6 +61,20 @@ spring:
           filters:
             - AuthenticationFilter
 
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - AuthenticationFilter
+
+        - id: log-service
+          uri: lb://LOG₹-SERVICE
+          predicates:
+            - Path=/api/logs/**
+          filters:
+            - AuthenticationFilter
+
 
   config:
     import: optional:file:.env[.properties]
