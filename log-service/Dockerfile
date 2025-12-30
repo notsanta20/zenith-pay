@@ -1,3 +1,3 @@
 FROM eclipse-temurin:22-jdk-alpine
-ADD target/profile-service.jar profile-service.jar
-ENTRYPOINT ["java", "-jar", "/profile-service.jar"]
+ADD target/log-service.jar log-service.jar
+ENTRYPOINT ["java", "-jar", "/log-service.jar"]
