@@ -62,6 +62,13 @@ services:
     networks:
       - zenith-network
 
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    networks:
+      - zenith-network
+
   service-registry:
     build: service-registry/
     ports:
@@ -120,6 +127,24 @@ services:
     environment:
       DB_USERNAME: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    networks:
+      - zenith-network
+
+  notification-service:
+    build: notification-service/
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    networks:
+      - zenith-network
+
+  log-service:
+    build: log-service/
+    ports:
+      - "8086:8086"
+    environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     networks:
       - zenith-network
