@@ -29,12 +29,11 @@ public class NotificationService {
                 .toList();
     }
 
-    public boolean addNotification(String userId, NotificationRequestDTO req) {
+    public boolean addNotification(NotificationRequestDTO req) {
         try{
             Notification notification = Notification.builder()
-                    .userId(userId)
+                    .userId(req.getUserId())
                     .notificationType(NotificationType.valueOf(req.getNotificationType()))
-                    .title(req.getTitle())
                     .message(req.getMessage())
                     .isRead(false)
                     .createdAt(LocalDateTime.now())

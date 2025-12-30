@@ -4,9 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class NotificationRequestDTO {
+    private String userId;
     private String notificationType;
-    private String title;
     private String message;
 }
