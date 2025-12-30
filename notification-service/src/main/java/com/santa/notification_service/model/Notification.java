@@ -19,7 +19,6 @@ public class Notification {
     private String id;
     private String userId;
     private NotificationType notificationType;
-    private String title;
     private String message;
     private boolean isRead;
     private LocalDateTime createdAt;
