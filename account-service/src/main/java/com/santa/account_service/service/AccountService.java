@@ -105,7 +105,7 @@ public class AccountService {
 
         accountRepo.save(account);
 
-        return new TransactionResponseDTO("Success", account.getBalance());
+        return new TransactionResponseDTO(account.getUserId().toString(), "Success", account.getBalance());
     }
 
     public Page<AccountResponseDTO> getAllAccounts(String userId, int page, int size) {
