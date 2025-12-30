@@ -4,6 +4,7 @@ import com.santa.auth_service.dto.*;
 import com.santa.auth_service.model.LogLevel;
 import com.santa.auth_service.model.LogServiceType;
 import com.santa.auth_service.producer.LogProducer;
+import com.santa.auth_service.producer.NotificationProducer;
 import com.santa.auth_service.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.SameSiteCookies;
@@ -20,12 +21,17 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
     private final boolean secureCookie;
+    private final NotificationProducer notificationProducer;
     private final LogProducer logProducer;
 
     @Autowired
-    public AuthController(AuthService authService, @Value("${secure.cookie}") boolean isSecure, LogProducer logProducer) {
+    public AuthController(AuthService authService,
+                          @Value("${secure.cookie}") boolean isSecure,
+                          NotificationProducer notificationProducer,
+                          LogProducer logProducer) {
         this.authService = authService;
         this.secureCookie = isSecure;
+        this.notificationProducer = notificationProducer;
         this.logProducer = logProducer;
     }
 
@@ -97,6 +103,14 @@ public class AuthController {
     @PutMapping("/update-password")
     public ResponseEntity<String> updatePassword(@RequestHeader("userId") String userId, @RequestBody UpdatePasswordDTO req) {
         authService.updatePassword(userId, req);
+
+        NotificationRequestDTO notification = NotificationRequestDTO.builder()
+                .userId(userId)
+                .message("Password has been updated.")
+                .notificationType("SECURITY")
+                .build();
+
+        notificationProducer.addNotification(notification);
 
         LogDTO log = LogDTO.builder()
                 .logLevel(LogLevel.INFO)

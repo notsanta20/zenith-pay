@@ -9,6 +9,7 @@ import com.santa.auth_service.exception.UserNotFoundException;
 import com.santa.auth_service.feign.AccountInterface;
 import com.santa.auth_service.feign.ProfileInterface;
 import com.santa.auth_service.model.User;
+import com.santa.auth_service.producer.NotificationProducer;
 import com.santa.auth_service.producer.ProfileCreationProducer;
 import com.santa.auth_service.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final ProfileInterface profileInterface;
     private final AccountInterface accountInterface;
+    private final NotificationProducer notificationProducer;
+
 
     @Autowired
     public AuthService(UserRepo userRepo,
@@ -40,13 +43,15 @@ public class AuthService {
                        AuthenticationManager authenticationManager,
                        JwtService jwtService,
                        ProfileInterface profileInterface,
-                       AccountInterface accountInterface) {
+                       AccountInterface accountInterface,
+                       NotificationProducer notificationProducer) {
         this.userRepo = userRepo;
         this.profileCreationProducer = profileCreationProducer;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.profileInterface = profileInterface;
         this.accountInterface = accountInterface;
+        this.notificationProducer = notificationProducer;
     }
 
     public RegisterResponseDTO registerUser(RegisterRequestDTO req) {
@@ -81,6 +86,14 @@ public class AuthService {
             user.setUpdatedAt(LocalDateTime.now());
 
             userRepo.save(user);
+
+            NotificationRequestDTO notification = NotificationRequestDTO.builder()
+                    .userId(user.getId().toString())
+                    .message("logged in.")
+                    .notificationType("SECURITY")
+                    .build();
+
+            notificationProducer.addNotification(notification);
 
             return LoginRes.builder()
                     .accessToken(token)

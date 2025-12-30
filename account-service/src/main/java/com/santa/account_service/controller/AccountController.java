@@ -4,6 +4,7 @@ import com.santa.account_service.dto.*;
 import com.santa.account_service.model.LogLevel;
 import com.santa.account_service.model.LogServiceType;
 import com.santa.account_service.producer.LogProducer;
+import com.santa.account_service.producer.NotificationProducer;
 import com.santa.account_service.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,17 +19,28 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final NotificationProducer notificationProducer;
     private final LogProducer logProducer;
 
+
     @Autowired
-    public AccountController(AccountService accountService, LogProducer logProducer) {
+    public AccountController(AccountService accountService, NotificationProducer notificationProducer, LogProducer logProducer) {
         this.accountService = accountService;
+        this.notificationProducer = notificationProducer;
         this.logProducer = logProducer;
     }
 
     @PostMapping("/create")
     public ResponseEntity<AccountResponseDTO> createAccount(@RequestBody AccountCreationRequestDTO req, @RequestHeader("userId") String userId) {
         AccountResponseDTO res = accountService.createAccount(req, userId);
+
+        NotificationRequestDTO notification = NotificationRequestDTO.builder()
+                .userId(userId)
+                .message("new account has been created.")
+                .notificationType("ACCOUNT")
+                .build();
+
+        notificationProducer.addNotification(notification);
 
         LogDTO log = LogDTO.builder()
                 .logLevel(LogLevel.INFO)
@@ -56,8 +68,16 @@ public class AccountController {
     }
 
     @PatchMapping("/update-status")
-    public ResponseEntity<AccountResponseDTO> updateAccountStatus(@RequestBody UpdateStatusRequestDTO req) {
+    public ResponseEntity<AccountResponseDTO> updateAccountStatus(@RequestBody UpdateStatusRequestDTO req, @RequestHeader("userId") String userId) {
         AccountResponseDTO res = accountService.updateAccountStatus(req);
+
+        NotificationRequestDTO notification = NotificationRequestDTO.builder()
+                .userId(userId)
+                .message("account status has been updated.")
+                .notificationType("ACCOUNT")
+                .build();
+
+        notificationProducer.addNotification(notification);
 
         LogDTO log = LogDTO.builder()
                 .logLevel(LogLevel.INFO)
@@ -73,6 +93,16 @@ public class AccountController {
     @PutMapping("/transact")
     public ResponseEntity<TransactionResponseDTO> updateAccountBalance(@RequestBody TransactionRequestDTO req) {
         TransactionResponseDTO res = accountService.updateAccountBalance(req);
+
+        String message = req.getTransactionType().equals("DEBIT") ? "transaction was successful." : "received money, check transactions";
+
+        NotificationRequestDTO notification = NotificationRequestDTO.builder()
+                .userId(res.getUserId())
+                .message(message)
+                .notificationType("ACCOUNT")
+                .build();
+
+        notificationProducer.addNotification(notification);
 
         LogDTO log = LogDTO.builder()
                 .logLevel(LogLevel.INFO)
