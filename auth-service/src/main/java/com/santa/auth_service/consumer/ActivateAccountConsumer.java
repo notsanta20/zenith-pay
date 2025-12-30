@@ -27,7 +27,8 @@ public class ActivateAccountConsumer {
 
     @KafkaListener(topics = "activate-account", groupId = "activate-account-group")
     public void activateAccount(String userId){
-        User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(()->new UserNotFoundException(userId));
+        String userIdTrimmed = userId.replaceAll("\"", "");
+        User user = userRepo.findById(UUID.fromString(userIdTrimmed)).orElseThrow(()->new UserNotFoundException(userId));
 
         user.setActive(true);
 

@@ -27,7 +27,8 @@ public class ProfileUpdateConsumer {
 
     @KafkaListener(topics = "update-profile", groupId = "update-profile-group")
     public void updateProfile(String userId) {
-        Profile profile = profileRepo.findById(UUID.fromString(userId)).orElseThrow(() -> new ProfileNotFoundException(userId));
+        String userIdTrimmed = userId.replaceAll("\"", "");
+        Profile profile = profileRepo.findById(UUID.fromString(userIdTrimmed)).orElseThrow(() -> new ProfileNotFoundException(userId));
         profile.setKyc_status(true);
         profileRepo.save(profile);
 
