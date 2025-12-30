@@ -69,7 +69,7 @@ spring:
             - AuthenticationFilter
 
         - id: log-service
-          uri: lb://LOG₹-SERVICE
+          uri: lb://LOG-SERVICE
           predicates:
             - Path=/api/logs/**
           filters:
