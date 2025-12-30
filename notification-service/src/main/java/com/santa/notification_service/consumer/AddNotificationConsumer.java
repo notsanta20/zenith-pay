@@ -17,7 +17,7 @@ public class AddNotificationConsumer {
     }
 
     @KafkaListener(topics = "add-notification", groupId = "add-notification-group")
-    public void addNotification(String userId , NotificationRequestDTO req){
-        notificationService.addNotification(userId, req);
+    public void addNotification(NotificationRequestDTO req){
+        notificationService.addNotification(req);
     }
 }
