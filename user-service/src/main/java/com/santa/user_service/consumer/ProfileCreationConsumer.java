@@ -27,8 +27,9 @@ public class ProfileCreationConsumer {
 
     @KafkaListener(topics = "create-profile", groupId = "create-profile-group")
     public void createProfile(String userId) {
+        String userIdTrimmed = userId.replaceAll("\"", "");
         Profile profile = Profile.builder()
-                .user_id(UUID.fromString(userId))
+                .user_id(UUID.fromString(userIdTrimmed))
                 .securityNotifications(true)
                 .generalNotifications(true)
                 .created_at(LocalDateTime.now())
