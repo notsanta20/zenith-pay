@@ -38,7 +38,7 @@ public class ProfileController {
 
         NotificationRequestDTO notification = NotificationRequestDTO.builder()
                 .userId(userId)
-                .message("profile has been updated.")
+                .message("user %s, profile updated.".formatted(userId))
                 .notificationType("PROFILE")
                 .build();
 
