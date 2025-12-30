@@ -29,8 +29,8 @@ public class NotificationController {
     }
 
     @PostMapping("/add")
-    public boolean addNotification(@RequestHeader("userId") String userId, @RequestBody NotificationRequestDTO req){
-        return notificationService.addNotification(userId,req);
+    public boolean addNotification(@RequestBody NotificationRequestDTO req){
+        return notificationService.addNotification(req);
     }
 
     @PutMapping("/read")
