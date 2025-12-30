@@ -19,33 +19,34 @@ public class ProfileService {
     private final ActivateAccountProducer activateAccountProducer;
 
     @Autowired
-    public ProfileService(ProfileRepo profileRepo, ActivateAccountProducer activateAccountProducer){
+    public ProfileService(ProfileRepo profileRepo, ActivateAccountProducer activateAccountProducer) {
         this.profileRepo = profileRepo;
         this.activateAccountProducer = activateAccountProducer;
     }
 
-    private Profile getProfileFunc(String userId){
-        return profileRepo.findById(UUID.fromString(userId)).orElseThrow(()->new ProfileNotFoundException(userId));
+    private Profile getProfileFunc(String userId) {
+        return profileRepo.findById(UUID.fromString(userId)).orElseThrow(() -> new ProfileNotFoundException(userId));
     }
 
-    public ProfileDTO getProfile(String userId){
+    public ProfileDTO getProfile(String userId) {
         Profile profile = getProfileFunc(userId);
 
         return new ProfileDTO(profile);
     }
 
-    public ProfileUpdateResponseDTO updateUser(ProfileUpdateRequestDTO req,String userId){
+    public ProfileUpdateResponseDTO updateUser(ProfileUpdateRequestDTO req, String userId) {
         Profile currentUser = getProfileFunc(userId);
 
         currentUser.setFull_name(req.getFullName());
         currentUser.setDob(LocalDate.parse(req.getDob()));
         currentUser.setPhone(req.getPhone());
-        currentUser.setKyc_status(false);
         currentUser.setUpdated_at(LocalDateTime.now());
 
         profileRepo.save(currentUser);
-        activateAccountProducer.activateAccount(userId);
 
+        if (!currentUser.isKyc_status()) {
+            activateAccountProducer.activateAccount(userId);
+        }
 
         return new ProfileUpdateResponseDTO("Profile has been updated", currentUser.isKyc_status());
     }
