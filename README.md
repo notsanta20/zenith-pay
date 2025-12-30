@@ -18,6 +18,14 @@ All services are secured via an **API Gateway**, communicate asynchronously usin
 
 ---
 
+## 🔗 Frontend Repository
+
+The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive React single-page application with backend-driven onboarding and protected routing.
+
+👉 **Frontend Repository:** https://github.com/your-username/zenith-pay-frontend
+
+---
+
 ## 🔹 Microservices
 
 | Service Name             | Description |
@@ -26,8 +34,8 @@ All services are secured via an **API Gateway**, communicate asynchronously usin
 | **user-service**         | Manages user profile details and KYC status. |
 | **account-service**      | Handles bank account creation and management. |
 | **transaction-service**  | Processes transactions and maintains transaction records. |
-| **notification-service** | Manages user notifications (MongoDB). |
-| **log-service**          | Centralized application logging (MongoDB). |
+| **notification-service** | Consumes Kafka events to create and manage user notifications, persisted in MongoDB. |
+| **log-service**          | Consumes Kafka events for centralized application and error logging, stored in MongoDB. |
 | **api-gateway**          | Secures and routes requests to backend services. |
 | **service-registry**     | Service discovery using Eureka Server. |
 
@@ -69,6 +77,12 @@ Kafka is used for **asynchronous inter-service communication**:
 - Centralized logging
 
 Kafka is not used as a primary data store; core APIs remain synchronous.
+
+### 📥 Kafka Consumers
+
+- **notification-service** subscribes to domain events (transactions, account updates, security events) and persists user-facing notifications in MongoDB.
+- **log-service** subscribes to application and error events from all services and stores structured logs in MongoDB for observability and auditing.
+
 
 ---
 
