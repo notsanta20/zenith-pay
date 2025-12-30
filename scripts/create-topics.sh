@@ -25,6 +25,20 @@ kafka-topics \
   --partitions 3 \
   --create
 
+kafka-topics \
+  --bootstrap-server kafka:9092 \
+  --topic create-log \
+  --replication-factor 1 \
+  --partitions 3 \
+  --create
+
+kafka-topics \
+  --bootstrap-server kafka:9092 \
+  --topic add-notification \
+  --replication-factor 1 \
+  --partitions 3 \
+  --create
+
 echo "Kafka topics created successfully."
 
 sleep infinity
