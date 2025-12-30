@@ -126,7 +126,7 @@ public class AuthService {
         return new UserBootstrapDTO(user.isActive(), userStatus.isKyc_status(), userStatus.isSecurityNotifications(), userStatus.isGeneralNotifications(), totalAccounts, username, user.getLastLoginAt());
     }
 
-    public void updatePassword(String userId, UpdatePasswordDTO req) {
+    public void updatePassword(String userId, PasswordDTO req) {
         User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(() -> new UserNotFoundException("No user found for Password change"));
 
         if (encoder.matches(req.getPassword(), user.getPasswordHash())) {
@@ -135,5 +135,11 @@ public class AuthService {
 
         user.setPasswordHash(encoder.encode(req.getPassword()));
         userRepo.save(user);
+    }
+
+    public boolean checkPassword(String userId, PasswordDTO req) {
+        User user = userRepo.findById(UUID.fromString(userId)).orElseThrow(() -> new UserNotFoundException("No user found for Password change"));
+
+        return encoder.matches(req.getPassword(), user.getPasswordHash());
     }
 }

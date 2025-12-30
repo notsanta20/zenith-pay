@@ -101,7 +101,7 @@ public class AuthController {
     }
 
     @PutMapping("/update-password")
-    public ResponseEntity<String> updatePassword(@RequestHeader("userId") String userId, @RequestBody UpdatePasswordDTO req) {
+    public ResponseEntity<String> updatePassword(@RequestHeader("userId") String userId, @RequestBody PasswordDTO req) {
         authService.updatePassword(userId, req);
 
         NotificationRequestDTO notification = NotificationRequestDTO.builder()
@@ -145,5 +145,12 @@ public class AuthController {
         logProducer.createLog(log);
 
         return new ResponseEntity<>("logged out successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/check-password")
+    public ResponseEntity<Boolean> checkPassword(@RequestHeader("userId") String userId, @RequestBody PasswordDTO req) {
+        boolean res = authService.checkPassword(userId, req);
+
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }
