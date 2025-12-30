@@ -27,10 +27,10 @@ public class TransactionController {
     }
 
     @PostMapping("/deposit")
-    public ResponseEntity<DepositResponseDTO> depositMoney(@RequestBody DepositRequestDTO req){
+    public ResponseEntity<DepositResponseDTO> depositMoney(@RequestBody DepositRequestDTO req, @RequestHeader("userId") String userId) {
         DepositResponseDTO res = transactionService.depositMoney(req);
 
-                LogDTO log = LogDTO.builder()
+        LogDTO log = LogDTO.builder()
                 .logLevel(LogLevel.INFO)
                 .serviceType(LogServiceType.TRANSACTION)
                 .message("transaction made on account number - **** **** %s.".formatted(req.getAccountNumber().substring(8)))
@@ -38,36 +38,36 @@ public class TransactionController {
 
         logProducer.createLog(log);
 
-        return new ResponseEntity<>(res,HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @GetMapping("/all-transactions/{accountNumber}")
-    public ResponseEntity<List<Transaction>> getAllTransactions(@PathVariable String accountNumber){
+    public ResponseEntity<List<Transaction>> getAllTransactions(@PathVariable String accountNumber) {
         List<Transaction> res = transactionService.getAllTransactions(accountNumber);
 
-        return new ResponseEntity<>(res,HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @PostMapping("/transact")
-    public ResponseEntity<TransactResponseDTO> transact(@RequestBody TransactRequestDTO req){
+    public ResponseEntity<TransactResponseDTO> transact(@RequestBody TransactRequestDTO req) {
         TransactResponseDTO res = transactionService.transact(req);
 
-                LogDTO log = LogDTO.builder()
+        LogDTO log = LogDTO.builder()
                 .logLevel(LogLevel.INFO)
                 .serviceType(LogServiceType.TRANSACTION)
-                .message("transacted from **** **** %s to **** **** %s.".formatted(req.getFromAccountNumber().substring(8),req.getToAccountNumber().substring(8)))
+                .message("transacted from **** **** %s to **** **** %s.".formatted(req.getFromAccountNumber().substring(8), req.getToAccountNumber().substring(8)))
                 .build();
 
         logProducer.createLog(log);
 
-        return new ResponseEntity<>(res,HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @GetMapping("/all-transactions")
-    public ResponseEntity<List<Transaction>> getAllUserTransactions(@RequestHeader("userId") String userId, @RequestParam(required = false) String limited){
+    public ResponseEntity<List<Transaction>> getAllUserTransactions(@RequestHeader("userId") String userId, @RequestParam(required = false) String limited) {
         List<Transaction> res = transactionService.getAllUserTransactions(userId, limited);
 
-        return new ResponseEntity<>(res,HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
 }
