@@ -12,5 +12,22 @@ spring:
     database: bank
     auto-index-creation: true
 
+  kafka:
+    consumer:
+      group-id: create-log-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            use:
+              type:
+                headers: false
+            value:
+              default:
+                type: com.santa.notification_service.dto.NotificationRequestDTO
+            trusted:
+              packages: com.santa.notification_service.dto
+
   config:
     import: optional:file:.env[.properties]
