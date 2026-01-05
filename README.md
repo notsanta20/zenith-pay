@@ -22,7 +22,7 @@ All services are secured via an **API Gateway**, communicate asynchronously usin
 
 The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive React single-page application with backend-driven onboarding and protected routing.
 
-👉 **Frontend Repository:** https://github.com/your-username/zenith-pay-frontend
+👉 **Frontend Repository:** https://github.com/notsanta20/zenith-pay-app
 
 ---
 
