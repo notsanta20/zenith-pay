@@ -7,8 +7,6 @@
 ![Kafka](https://img.shields.io/badge/Apache%20Kafka-Event--Driven-black?logo=apachekafka)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue?logo=docker)
 
----
-
 ## Overview
 
 **Zenith Pay** is a **banking backend platform** built using a **Spring Boot microservices architecture**, following real-world fintech design patterns.
@@ -16,15 +14,11 @@
 The system provides services for authentication, user profiles, accounts, transactions, notifications, and logs.  
 All services are secured via an **API Gateway**, communicate asynchronously using **Apache Kafka**, and are fully containerized using **Docker Compose**.
 
----
-
 ## Frontend Repository
 
 The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive React single-page application with backend-driven onboarding and protected routing.
 
 **Frontend Repository:** https://github.com/notsanta20/zenith-pay-app
-
----
 
 ## Microservices
 
@@ -39,8 +33,6 @@ The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive 
 | **api-gateway**          | Secures and routes requests to backend services. |
 | **service-registry**     | Service discovery using Eureka Server. |
 
----
-
 ## Tech Stack
 
 - **Backend:** Java, Spring Boot, Spring Cloud
@@ -54,8 +46,6 @@ The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive 
 - **Containerization:** Docker, Docker Compose
 - **Testing:** JUnit
 
----
-
 ## Security & Authentication
 
 - JWT-based authentication
@@ -64,8 +54,6 @@ The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive 
 - All other APIs are protected at the **API Gateway**
 - Gateway validates JWT and injects `userId` and `email` into request headers
 - Centralized exception handling across all services
-
----
 
 ## Kafka Usage (Async Side-Effects)
 
@@ -82,9 +70,6 @@ Kafka is not used as a primary data store; core APIs remain synchronous.
 
 - **notification-service** subscribes to domain events (transactions, account updates, security events) and persists user-facing notifications in MongoDB.
 - **log-service** subscribes to application and error events from all services and stores structured logs in MongoDB for observability and auditing.
-
-
----
 
 ## Getting Started
 
