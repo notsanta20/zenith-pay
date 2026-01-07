@@ -1,4 +1,4 @@
-# 🏦 Zenith Pay
+# Zenith Pay
 
 ![Java](https://img.shields.io/badge/Java-17%2B-blue?logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?logo=springboot)
@@ -9,7 +9,7 @@
 
 ---
 
-## 🏗️ Overview
+## Overview
 
 **Zenith Pay** is a **banking backend platform** built using a **Spring Boot microservices architecture**, following real-world fintech design patterns.
 
@@ -18,15 +18,15 @@ All services are secured via an **API Gateway**, communicate asynchronously usin
 
 ---
 
-## 🔗 Frontend Repository
+## Frontend Repository
 
 The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive React single-page application with backend-driven onboarding and protected routing.
 
-👉 **Frontend Repository:** https://github.com/notsanta20/zenith-pay-app
+**Frontend Repository:** https://github.com/notsanta20/zenith-pay-app
 
 ---
 
-## 🔹 Microservices
+## Microservices
 
 | Service Name             | Description |
 |--------------------------|-------------|
@@ -41,7 +41,7 @@ The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive 
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 - **Backend:** Java, Spring Boot, Spring Cloud
 - **Databases:**
@@ -56,7 +56,7 @@ The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive 
 
 ---
 
-## 🔐 Security & Authentication
+## Security & Authentication
 
 - JWT-based authentication
 - Tokens stored in **HttpOnly cookies**
@@ -67,7 +67,7 @@ The backend is consumed by the **Zenith Pay Frontend**, a secure and responsive 
 
 ---
 
-## 🔄 Kafka Usage (Async Side-Effects)
+## Kafka Usage (Async Side-Effects)
 
 Kafka is used for **asynchronous inter-service communication**:
 
@@ -78,7 +78,7 @@ Kafka is used for **asynchronous inter-service communication**:
 
 Kafka is not used as a primary data store; core APIs remain synchronous.
 
-### 📥 Kafka Consumers
+### Kafka Consumers
 
 - **notification-service** subscribes to domain events (transactions, account updates, security events) and persists user-facing notifications in MongoDB.
 - **log-service** subscribes to application and error events from all services and stores structured logs in MongoDB for observability and auditing.
@@ -86,7 +86,7 @@ Kafka is not used as a primary data store; core APIs remain synchronous.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1️⃣ Prerequisites
 - Java 17+
